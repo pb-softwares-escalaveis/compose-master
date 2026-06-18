@@ -1,0 +1,283 @@
+# ============================================================
+# VOLUMES E REDES
+# ============================================================
+volumes:
+  leilao-kafka-data:
+  postgres_data:
+    name: user-service-db-volume
+  keycloak_data:
+    name: keycloak-data-volume
+
+networks:
+  leilao-network:
+    external: true
+
+# ============================================================
+# INFRAESTRUTURA
+# ============================================================
+services:
+  eureka-server:
+    container_name: eureka-server
+    image: steeltoeoss/eureka-server:latest
+    ports:
+      - "8761:8761"
+    networks:
+      - leilao-network
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8761/actuator/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+  kafka:
+    image: apache/kafka:4.3.0
+    container_name: leilao-kafka
+    ports:
+      - "9092:9092"
+    networks:
+      - leilao-network
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+
+      KAFKA_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://0.0.0.0:9092,CONTROLLER://kafka:29093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT,CONTROLLER:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:29093
+
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"
+    volumes:
+      - leilao-kafka-data:/var/lib/kafka/data
+    healthcheck:
+      test: [
+        "CMD-SHELL",
+        "/opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list >/dev/null 2>&1"
+      ]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+
+  kafka-init:
+    image: apache/kafka:4.3.0
+    networks:
+      - leilao-network
+    depends_on:
+      kafka:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+    volumes:
+      - ./config/topics.txt:/config/topics.txt
+      - ./config/create-topics.sh:/config/create-topics.sh
+    entrypoint: ["/bin/sh", "/config/create-topics.sh"]
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: leilao-kafka-ui
+    networks:
+      - leilao-network
+    depends_on:
+      kafka:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+    ports:
+      - "8085:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: leilao-local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092
+
+  ksqldb-server:
+    image: confluentinc/ksqldb-server:0.29.0
+    container_name: ksqldb-server
+    networks:
+      - leilao-network
+    depends_on:
+      kafka:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+    ports:
+      - "8088:8088"
+    environment:
+      KSQL_BOOTSTRAP_SERVERS: kafka:29092
+      KSQL_HOST_NAME: ksqldb-server
+      KSQL_LISTENERS: http://0.0.0.0:8088
+      KSQL_CACHE_MAX_BYTES_BUFFERING: 0
+      KSQL_KSQL_SERVICE_ID: "ksql_service_01"
+      KSQL_KSQL_STREAMS_AUTO_OFFSET_RESET: earliest
+
+  ksqldb-init:
+    image: confluentinc/ksqldb-cli:0.29.0
+    container_name: ksqldb-init
+    networks:
+      - leilao-network
+    depends_on:
+      kafka-init:
+        condition: service_completed_successfully
+      ksqldb-server:
+        condition: service_started
+    volumes:
+      - ./config/ksqldb/init:/scripts
+      - ./config/ksqldb-init.sh:/init.sh
+    entrypoint: ["/bin/sh", "/init.sh"]
+
+  ksqldb-cli:
+    image: confluentinc/ksqldb-cli:0.29.0
+    container_name: ksqldb-cli
+    networks:
+      - leilao-network
+    depends_on:
+      ksqldb-server:
+        condition: service_started
+    entrypoint: ["/bin/sh", "-c", "sleep infinity"]
+    tty: true
+
+  # ============================================================
+  # USER-SERVICE
+  # ============================================================
+  postgres:
+    container_name: postgres-user-service
+    image: postgres:17-alpine3.23
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-dbs.sql:/docker-entrypoint-initdb.d/init-dbs.sql
+    environment:
+      POSTGRES_USER: ${USER_SERVICE_DB_USER}
+      POSTGRES_PASSWORD: ${USER_SERVICE_DB_PASSWORD}
+      POSTGRES_DB: userservicedb
+    ports:
+      - "${USER_SERVICE_DB_PORT}:5432"
+    networks:
+      - leilao-network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -d userservicedb -U ${USER_SERVICE_DB_USER}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  keycloak:
+    container_name: keycloak
+    image: quay.io/keycloak/keycloak:26.6.2
+    volumes:
+      - keycloak_data:/opt/keycloak/data
+      - ./realm-export.json:/opt/keycloak/data/import/realm-export.json
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: ${KEYCLOAK_ADMIN_USER}
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT}
+      SMTP_FROM: ${SMTP_FROM}
+      SMTP_USER: ${SMTP_USER}
+      SMTP_PASSWORD: ${SMTP_PASSWORD}
+      KC_DB: postgres
+      KC_DB_URL: ${KEYCLOAK_DB_URL}
+      KC_DB_USERNAME: ${USER_SERVICE_DB_USER}
+      KC_DB_PASSWORD: ${USER_SERVICE_DB_PASSWORD}
+      KC_HEALTH_ENABLED: "true"
+    ports:
+      - "${KEYCLOAK_PORT}:8080"
+    command: start-dev --import-realm
+    networks:
+      - leilao-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD-SHELL", "cat /dev/null > /dev/tcp/127.0.0.1/8080 || exit 1" ]
+      interval: 20s
+      timeout: 5s
+      retries: 15
+
+  user-service:
+    container_name: user-service
+    image: shyuu7/user-service:latest
+    restart: always
+    ports:
+      - "${USER_SERVICE_PORT}:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      SPRING_DATASOURCE_URL: ${USER_SERVICE_DB_URL}
+      SPRING_DATASOURCE_USERNAME: ${USER_SERVICE_DB_USER}
+      SPRING_DATASOURCE_PASSWORD: ${USER_SERVICE_DB_PASSWORD}
+      KEYCLOAK_INTERNAL_URL: ${KEYCLOAK_INTERNAL_URL}
+      KEYCLOAK_CLIENT_SECRET_USER_SERVICE: ${KEYCLOAK_CLIENT_SECRET_USER_SERVICE}
+      S3_ENDPOINT: ${S3_ENDPOINT}
+      USER_SERVICE_S3_BUCKET_NAME: ${USER_SERVICE_S3_BUCKET_NAME}
+      S3_ACCESS_KEY: ${S3_ACCESS_KEY}
+      S3_SECRET_KEY: ${S3_SECRET_KEY}
+      SPRING_DATA_REDIS_HOST: ${USER_SERVICE_REDIS_HOST}
+      SPRING_DATA_REDIS_PORT: ${USER_SERVICE_REDIS_PORT}
+      SPRING_DATA_REDIS_REPOSITORIES_ENABLED: false
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: ${KAFKA_SERVERS}
+      LOGSTASH_HOST: ${LOGSTASH_HOST}
+      LOGSTASH_PORT: ${LOGSTASH_PORT}
+    networks:
+      - leilao-network
+    depends_on:
+      kafka-init:
+        condition: service_completed_successfully
+      postgres:
+        condition: service_healthy
+      keycloak:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+
+  redis:
+    image: redis:8.8.0-alpine
+    container_name: redis-user-service
+    ports:
+      - "${USER_SERVICE_REDIS_PORT}:6379"
+    networks:
+      - leilao-network
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # ============================================================
+  # API GATEWAY
+  # ============================================================
+  api-gateway:
+    container_name: api-gateway
+    image: shyuu7/api-gateway:latest
+    ports:
+      - "9999:9999"
+    networks:
+      - leilao-network
+    environment:
+      EUREKA_SERVER_URL: ${EUREKA_SERVER_URL}
+      KEYCLOAK_INTERNAL_URL: ${KEYCLOAK_INTERNAL_URL}
+      KEYCLOAK_EXTERNAL_URL: ${KEYCLOAK_EXTERNAL_URL}
+      KEYCLOAK_CLIENT_SECRET_API_GATEWAY: ${KEYCLOAK_CLIENT_SECRET_API_GATEWAY}
+      FRONTEND_URL: ${FRONTEND_URL}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:9999/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    depends_on:
+      - eureka-server
+      - keycloak
