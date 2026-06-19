@@ -286,7 +286,7 @@ services:
       KEYCLOAK_EXTERNAL_URL: ${KEYCLOAK_EXTERNAL_URL}
       KEYCLOAK_CLIENT_SECRET_API_GATEWAY: ${KEYCLOAK_CLIENT_SECRET_API_GATEWAY}
       EUREKA_CLIENT_REGISTER_WITH_EUREKA: false
-      EUREKA_CLIENT_FETCH_REGISTRY: true
+      EUREKA_CLIENT_FETCH_REGISTRY: ${EUREKA_CLIENT_FETCH_REGISTRY}
       FRONTEND_URL: ${FRONTEND_URL}
     restart: unless-stopped
     healthcheck:
@@ -362,7 +362,7 @@ services:
     ports:
       - "8089:5432"
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U paymentdb" ]
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -475,7 +475,7 @@ services:
     ports:
       - "8086:5432"
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U notificationdb" ]
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -681,6 +681,7 @@ services:
       REVIEW_SERVICE_DB_PASSWORD: ${REVIEW_SERVICE_DB_PASSWORD}
       KAFKA_SERVERS: ${KAFKA_BOOTSTRAP_SERVERS}
       GEMINI_API_KEY: ${GEMINI_API_KEY}
+      EUREKA_SERVER_URL: ${EUREKA_SERVER_URL}
       EUREKA_CLIENT_REGISTER_WITH_EUREKA: ${EUREKA_CLIENT_REGISTER_WITH_EUREKA}
       EUREKA_CLIENT_FETCH_REGISTRY: ${EUREKA_CLIENT_FETCH_REGISTRY}
     networks:
@@ -694,7 +695,7 @@ services:
   # QA-SERVICE
   # ============================================================
   qa-service:
-    image: sylviocheleiro/qa-service:latest
+    image: pedrovncs/qa-service:latest
     container_name: qa-service
     restart: unless-stopped
     ports:
@@ -705,8 +706,12 @@ services:
       QA_SERVICE_DB_URL: jdbc:postgresql://postgres-qa:5432/qa_service_db
       QA_SERVICE_DB_USER: ${QA_SERVICE_DB_USER}
       QA_SERVICE_DB_PASSWORD: ${QA_SERVICE_DB_PASSWORD}
-      QA_SERVICE_REDIS_HOST: redis-qa
-      QA_SERVICE_REDIS_PORT: 6379
+      KAFKA_SERVERS: ${KAFKA_BOOTSTRAP_SERVERS}
+      EUREKA_CLIENT_REGISTER_WITH_EUREKA: ${EUREKA_CLIENT_REGISTER_WITH_EUREKA}
+      EUREKA_CLIENT_FETCH_REGISTRY: ${EUREKA_CLIENT_FETCH_REGISTRY}
+      EUREKA_SERVER_URL: ${EUREKA_SERVER_URL}
+      QA_SERVICE_REDIS_HOST: ${QA_SERVICE_REDIS_HOST}
+      QA_SERVICE_REDIS_PORT: ${QA_SERVICE_REDIS_PORT}
     depends_on:
       postgres-qa:
         condition: service_healthy
