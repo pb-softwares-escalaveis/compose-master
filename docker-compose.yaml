@@ -356,11 +356,11 @@ services:
       - leilao-network
     restart: unless-stopped
     environment:
-      POSTGRES_DB: paymentdb
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
+      POSTGRES_DB: ${PAYMENT_SERVICE_POSTGRES_DB}
+      POSTGRES_USER: ${PAYMENT_SERVICE_POSTGRES_POSTGRES_USE}
+      POSTGRES_PASSWORD: ${PAYMENT_SERVICE_POSTGRES_PASSWORD}
     ports:
-      - "8089:5432"
+      - "${PAYMENT_SERVICE_POSTGRES_PORT}:5432"
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U postgres" ]
       interval: 10s
@@ -433,6 +433,7 @@ services:
       POSTGRES_DB: qa_service_db
       POSTGRES_USER: ${QA_SERVICE_DB_USER}
       POSTGRES_PASSWORD: ${QA_SERVICE_DB_PASSWORD}
+      QA_SERVICE_REDIS_HOST: ${QA_SERVICE_REDIS_HOST}
     ports:
       - "${QA_SERVICE_DB_PORT}:5432"
     volumes:
@@ -444,6 +445,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+
   # ============================================================
   # QA-SERVICE DATABASE
   # ============================================================
@@ -469,11 +471,12 @@ services:
     container_name: notificationdb
     image: postgres:17-alpine3.23
     environment:
-      POSTGRES_DB: notificationdb
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
+      POSTGRES_DB: ${NOTIFICATION_SERVICE_POSTGRES_DB}
+      POSTGRES_USER: ${NOTIFICATION_SERVICE_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${NOTIFICATION_SERVICE_POSTGRES_PASSWORD}
     ports:
-      - "8086:5432"
+      - "${NOTIFICATION_SERVICE_POSTGRES_PORT}:5432"
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U postgres" ]
       interval: 10s
@@ -495,6 +498,7 @@ services:
     ports:
       - "${REPORT_SERVICE_DB_PORT}:5432"
     environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://report-service-postgres:5432/report
       POSTGRES_DB: report
       POSTGRES_USER: ${REPORT_SERVICE_DB_USER}
       POSTGRES_PASSWORD: ${REPORT_SERVICE_DB_PASSWORD}
@@ -643,9 +647,9 @@ services:
     env_file:
       - .env
     ports:
-      - "8087:8081"
+      - "${NOTIFICATION_SERVICE_PORT}:8080"
     healthcheck:
-      test: [ "CMD-SHELL", "wget -qO- http://localhost:8081/actuator/health || exit 1" ]
+      test: [ "CMD-SHELL", "wget -qO- http://localhost:8080/actuator/health || exit 1" ]
       interval: 20s
       timeout: 10s
       retries: 5
@@ -674,7 +678,7 @@ services:
     ports:
       - "${REVIEW_SERVICE_PORT}:8084"
     environment:
-      SPRING_PROFILES_ACTIVE: prod
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
       REVIEW_SERVICE_PORT: ${REVIEW_SERVICE_PORT}
       SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL_REVIEW}
       REVIEW_SERVICE_DB_USER: ${REVIEW_SERVICE_DB_USER}
@@ -701,7 +705,7 @@ services:
     ports:
       - "${QA_SERVICE_PORT}:8098"
     environment:
-      SPRING_PROFILES_ACTIVE: prod
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
       QA_SERVICE_PORT: 8098
       QA_SERVICE_DB_URL: jdbc:postgresql://postgres-qa:5432/qa_service_db
       QA_SERVICE_DB_USER: ${QA_SERVICE_DB_USER}
@@ -767,9 +771,9 @@ services:
     env_file:
       - .env
     ports:
-      - "8180:8082"
+      - "${PAYMENT_SERVICE_PORT}:8080"
     healthcheck:
-      test: [ "CMD-SHELL", "wget -qO- http://localhost:8082/actuator/health || exit 1" ]
+      test: [ "CMD-SHELL", "wget -qO- http://localhost:8080/actuator/health || exit 1" ]
       interval: 20s
       timeout: 10s
       retries: 5
