@@ -5,16 +5,14 @@ volumes:
   listing-elastic-data:
   leilao-kafka-data:
   review-postgres-data:
-  qa_postgres_data:
-  qa_redis_data:
+  qa-postgres-data:
+  qa-redis-data:
   report-service-postgres-data:
-  paymentdb_data:
-  transactiondb_data:
-  notificationdb_data:
-  userservicedb_data:
-    name: user-service-db-volume
-  keycloak_data:
-    name: keycloak-data-volume
+  paymentdb-data:
+  transactiondb-data:
+  notificationdb-data:
+  userservicedb-data:
+  keycloak-data:
 
 networks:
   leilao-network:
@@ -237,7 +235,7 @@ services:
     container_name: keycloak
     image: quay.io/keycloak/keycloak:26.6.2
     volumes:
-      - keycloak_data:/opt/keycloak/data
+      - keycloak-data:/opt/keycloak/data
       - ./realm-export.json:/opt/keycloak/data/import/realm-export.json
     environment:
       KC_BOOTSTRAP_ADMIN_USERNAME: ${KEYCLOAK_ADMIN_USER}
@@ -328,7 +326,7 @@ services:
     container_name: user-service-db
     image: postgres:17-alpine3.23
     volumes:
-      - userservicedb_data:/var/lib/postgresql/data
+      - userservicedb-data:/var/lib/postgresql/data
       - ./src/main/resources/db/user-service:/docker-entrypoint-initdb.d
     environment:
       POSTGRES_USER: ${USER_SERVICE_DB_USER}
@@ -368,7 +366,7 @@ services:
       retries: 5
       start_period: 30s
     volumes:
-      - paymentdb_data:/var/lib/postgresql/data
+      - paymentdb-data:/var/lib/postgresql/data
       - ./src/main/resources/db/payment-service:/docker-entrypoint-initdb.d
 
   # ============================================================
@@ -428,16 +426,15 @@ services:
   # ============================================================
   postgres-qa:
     image: postgres:17-alpine3.23
-    container_name: qa_service_postgres
+    container_name: qa-service-postgres
     environment:
       POSTGRES_DB: qa_service_db
       POSTGRES_USER: ${QA_SERVICE_DB_USER}
       POSTGRES_PASSWORD: ${QA_SERVICE_DB_PASSWORD}
-      QA_SERVICE_REDIS_HOST: ${QA_SERVICE_REDIS_HOST}
     ports:
       - "${QA_SERVICE_DB_PORT}:5432"
     volumes:
-      - qa_postgres_data:/var/lib/postgresql/data
+      - qa-postgres-data:/var/lib/postgresql/data
     networks:
       - leilao-network
     healthcheck:
@@ -447,7 +444,7 @@ services:
       retries: 5
 
   # ============================================================
-  # QA-SERVICE DATABASE
+  # QA-SERVICE REDIS
   # ============================================================
   redis-qa:
     image: redis:8.8.0-alpine
@@ -455,7 +452,7 @@ services:
     ports:
       - "${QA_SERVICE_REDIS_PORT}:6379"
     volumes:
-      - qa_redis_data:/data
+      - qa-redis-data:/data
     networks:
       - leilao-network
     healthcheck:
@@ -484,7 +481,7 @@ services:
       retries: 5
       start_period: 30s
     volumes:
-      - notificationdb_data:/var/lib/postgresql/data
+      - notificationdb-data:/var/lib/postgresql/data
       - ./src/main/resources/db/notification-service:/docker-entrypoint-initdb.d
     networks:
       - leilao-network
@@ -526,7 +523,7 @@ services:
     ports:
       - "${TRANSACTION_SERVICE_DB_PORT}:5432"
     volumes:
-      - transactiondb_data:/var/lib/postgresql/data
+      - transactiondb-data:/var/lib/postgresql/data
       - ./src/main/resources/db/transaction-service:/docker-entrypoint-initdb.d
     networks:
       - leilao-network
@@ -567,7 +564,7 @@ services:
   # ============================================================
   report-service:
     container_name: report-service
-    image: pedrovncs/report-service:latest
+    image: gabrielmeruzzi/report-service:latest
     restart: always
     ports:
       - "${REPORT_SERVICE_PORT}:8081"
@@ -695,6 +692,7 @@ services:
         condition: service_healthy
       kafka-init:
         condition: service_completed_successfully
+
   # ============================================================
   # QA-SERVICE
   # ============================================================
