@@ -16,7 +16,7 @@ volumes:
 
 networks:
   leilao-network:
-    external: true
+    name: leilao-network
 
 # ============================================================
 # INFRAESTRUTURA
@@ -355,7 +355,7 @@ services:
     restart: unless-stopped
     environment:
       POSTGRES_DB: ${PAYMENT_SERVICE_POSTGRES_DB}
-      POSTGRES_USER: ${PAYMENT_SERVICE_POSTGRES_POSTGRES_USER}
+      POSTGRES_USER: ${PAYMENT_SERVICE_POSTGRES_USER}
       POSTGRES_PASSWORD: ${PAYMENT_SERVICE_POSTGRES_PASSWORD}
     ports:
       - "${PAYMENT_SERVICE_POSTGRES_PORT}:5432"
@@ -640,7 +640,7 @@ services:
   # ============================================================
   notification-service:
     container_name: notification-service
-    image: pedrovncs/notification-service:latest
+    image: oleiloeiroonline/notification-service:latest
     env_file:
       - .env
     ports:
@@ -764,7 +764,7 @@ services:
   # PAYMENT-SERVICE
   # ============================================================
   payment-service:
-    image: pedrovncs/payment-service:latest
+    image: oleiloeiroonline/payment-service:latest
     container_name: payment-service
     env_file:
       - .env
