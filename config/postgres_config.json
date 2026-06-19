@@ -1,0 +1,25 @@
+{
+  "name": "postgres-source-connector",
+  "config": {
+    "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
+    
+    "database.hostname": "auction-service-postgres",
+    "database.port": "5432",
+    "database.user": "postgres",
+    "database.password": "deusnaoexiste",
+    "database.dbname": "postgres",
+    
+    "topic.prefix": "auction_connect",
+    "plugin.name": "pgoutput",
+    
+    "table.include.list": "public.auction_lots",
+    
+    "decimal.handling.mode": "double",
+    "time.precision.mode": "connect",
+    
+    "key.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "key.converter.schemas.enable": "false",
+    "value.converter.schemas.enable": "false"
+  }
+}

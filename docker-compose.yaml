@@ -2,7 +2,12 @@
 # VOLUMES E REDES
 # ============================================================
 volumes:
+  listing-elastic-data:
   leilao-kafka-data:
+  review-postgres-data:
+  qa_postgres_data:
+  qa_redis_data:
+  report-service-postgres-data:
   paymentdb_data:
   transactiondb_data:
   notificationdb_data:
@@ -68,7 +73,7 @@ services:
       eureka-server:
         condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "/opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list >/dev/null 2>&1"]
+      test: [ "CMD-SHELL", "/opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list >/dev/null 2>&1" ]
       interval: 30s
       timeout: 20s
       retries: 15
@@ -91,7 +96,7 @@ services:
     volumes:
       - ./config/topics.txt:/config/topics.txt
       - ./config/create-topics.sh:/config/create-topics.sh
-    entrypoint: ["/bin/sh", "/config/create-topics.sh"]
+    entrypoint: [ "/bin/sh", "/config/create-topics.sh" ]
 
   # ============================================================
   # KAFKA UI
@@ -110,6 +115,57 @@ services:
     environment:
       KAFKA_CLUSTERS_0_NAME: leilao-local
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092
+
+  # ============================================================
+  # KAFKA CONNECT
+  # ============================================================
+  kafka-connect:
+    image: debezium/connect:2.7.3.Final
+    container_name: auction-kafka-connect
+    ports:
+      - "${KAFKA_CONNECT_PORT}:8083"
+    environment:
+      BOOTSTRAP_SERVERS: kafka:29092
+      GROUP_ID: auction-connect-cluster
+      CONFIG_STORAGE_TOPIC: auction_connect_configs
+      OFFSET_STORAGE_TOPIC: auction_connect_offsets
+      STATUS_STORAGE_TOPIC: auction_connect_statuses
+
+      KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+      VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+      KEY_CONVERTER_SCHEMAS_ENABLE: "false"
+      VALUE_CONVERTER_SCHEMAS_ENABLE: "false"
+    depends_on:
+      kafka:
+        condition: service_healthy
+      kafka-init:
+        condition: service_completed_successfully
+      auction-postgres:
+        condition: service_healthy
+    networks:
+      - leilao-network
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://localhost:8083/connectors || exit 1" ]
+      interval: 10s
+      timeout: 10s
+      retries: 15
+      start_period: 30s
+
+  # ============================================================
+  # KAFKA CONNECT INIT
+  # ============================================================
+  kafka-connect-init:
+    image: curlimages/curl:latest
+    container_name: auction-kafka-connect-init
+    depends_on:
+      kafka-connect:
+        condition: service_healthy
+    volumes:
+      - ./config/postgres_config.json:/config/postgres_config.json:ro
+      - ./config/register-connector.sh:/config/register-connector.sh:ro
+    networks:
+      - leilao-network
+    entrypoint: [ "/bin/sh", "/config/register-connector.sh" ]
 
   # ============================================================
   # KSQL SERVER
@@ -135,7 +191,7 @@ services:
       KSQL_KSQL_SERVICE_ID: "ksql_service_01"
       KSQL_KSQL_STREAMS_AUTO_OFFSET_RESET: earliest
     healthcheck:
-      test: ["CMD-SHELL", "nc -z localhost 8088 || exit 1"]
+      test: [ "CMD-SHELL", "nc -z localhost 8088 || exit 1" ]
       interval: 30s
       timeout: 10s
       retries: 10
@@ -158,7 +214,7 @@ services:
     volumes:
       - ./config/ksqldb/init:/scripts
       - ./config/ksqldb-init.sh:/init.sh
-    entrypoint: ["/bin/sh", "/init.sh"]
+    entrypoint: [ "/bin/sh", "/init.sh" ]
 
   # ============================================================
   # KSQL CLI
@@ -171,7 +227,7 @@ services:
     depends_on:
       ksqldb-server:
         condition: service_healthy
-    entrypoint: ["/bin/sh", "-c", "sleep infinity"]
+    entrypoint: [ "/bin/sh", "-c", "sleep infinity" ]
     tty: true
 
   # ============================================================
@@ -215,7 +271,40 @@ services:
       start_period: 180s
 
   # ============================================================
-  # REDIS
+  # API GATEWAY
+  # ============================================================
+  api-gateway:
+    container_name: api-gateway
+    image: shyuu7/api-gateway:latest
+    ports:
+      - "9999:9999"
+    networks:
+      - leilao-network
+    environment:
+      EUREKA_SERVER_URL: ${EUREKA_SERVER_URL}
+      KEYCLOAK_INTERNAL_URL: ${KEYCLOAK_INTERNAL_URL}
+      KEYCLOAK_EXTERNAL_URL: ${KEYCLOAK_EXTERNAL_URL}
+      KEYCLOAK_CLIENT_SECRET_API_GATEWAY: ${KEYCLOAK_CLIENT_SECRET_API_GATEWAY}
+      EUREKA_CLIENT_REGISTER_WITH_EUREKA: false
+      EUREKA_CLIENT_FETCH_REGISTRY: true
+      FRONTEND_URL: ${FRONTEND_URL}
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:9999/actuator/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 120s
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+      keycloak:
+        condition: service_healthy
+      user-service:
+        condition: service_healthy
+
+  # ============================================================
+  # USER-SERVICE REDIS
   # ============================================================
   user-service-redis:
     image: redis:8.8.0-alpine
@@ -273,7 +362,7 @@ services:
     ports:
       - "8089:5432"
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      test: [ "CMD-SHELL", "pg_isready -U paymentdb" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -281,6 +370,97 @@ services:
     volumes:
       - paymentdb_data:/var/lib/postgresql/data
       - ./src/main/resources/db/payment-service:/docker-entrypoint-initdb.d
+
+  # ============================================================
+  # REVIEW-SERVICE DATABASE
+  # ============================================================
+  review-postgres:
+    image: postgres:17-alpine3.23
+    container_name: review-postgres
+    ports:
+      - "${REVIEW_SERVICE_DB_PORT}:5432"
+    environment:
+      POSTGRES_DB: review
+      POSTGRES_USER: ${REVIEW_SERVICE_DB_USER}
+      POSTGRES_PASSWORD: ${REVIEW_SERVICE_DB_PASSWORD}
+    volumes:
+      - review-postgres-data:/var/lib/postgresql/data
+      - ./src/main/resources/db/review-service:/docker-entrypoint-initdb.d
+    networks:
+      - leilao-network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+  # ============================================================
+  # AUCTION-SERVICE DATABASE
+  # ============================================================
+  auction-postgres:
+    image: postgres:17-alpine3.23
+    container_name: auction-service-postgres
+    environment:
+      POSTGRES_USER: ${AUCTION_SERVICE_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${AUCTION_SERVICE_POSTGRES_PASSWORD}
+      POSTGRES_DB: postgres
+    ports:
+      - "${AUCTION_SERVICE_POSTGRES_PORT}:5432"
+    command:
+      - "postgres"
+      - "-c"
+      - "wal_level=logical"
+      - "-c"
+      - "max_wal_senders=1"
+      - "-c"
+      - "max_replication_slots=1"
+    volumes:
+      - ./src/main/resources/db/auction-service:/docker-entrypoint-initdb.d
+    networks:
+      - leilao-network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${AUCTION_SERVICE_POSTGRES_USER}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  # ============================================================
+  # QA-SERVICE DATABASE
+  # ============================================================
+  postgres-qa:
+    image: postgres:17-alpine3.23
+    container_name: qa_service_postgres
+    environment:
+      POSTGRES_DB: qa_service_db
+      POSTGRES_USER: ${QA_SERVICE_DB_USER}
+      POSTGRES_PASSWORD: ${QA_SERVICE_DB_PASSWORD}
+    ports:
+      - "${QA_SERVICE_DB_PORT}:5432"
+    volumes:
+      - qa_postgres_data:/var/lib/postgresql/data
+    networks:
+      - leilao-network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${QA_SERVICE_DB_USER:-qa_user} -d qa_service_db" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  # ============================================================
+  # QA-SERVICE DATABASE
+  # ============================================================
+  redis-qa:
+    image: redis:8.8.0-alpine
+    container_name: qa_service_redis
+    ports:
+      - "${QA_SERVICE_REDIS_PORT}:6379"
+    volumes:
+      - qa_redis_data:/data
+    networks:
+      - leilao-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   # ============================================================
   # NOTIFICATION-SERVICE DATABASE
@@ -295,7 +475,7 @@ services:
     ports:
       - "8086:5432"
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      test: [ "CMD-SHELL", "pg_isready -U notificationdb" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -305,6 +485,29 @@ services:
       - ./src/main/resources/db/notification-service:/docker-entrypoint-initdb.d
     networks:
       - leilao-network
+
+  # ============================================================
+  # REPORT-SERVICE DATABASE
+  # ============================================================
+  report-service-postgres:
+    image: postgres:17-alpine3.23
+    container_name: report-service-postgres
+    ports:
+      - "${REPORT_SERVICE_DB_PORT}:5432"
+    environment:
+      POSTGRES_DB: report
+      POSTGRES_USER: ${REPORT_SERVICE_DB_USER}
+      POSTGRES_PASSWORD: ${REPORT_SERVICE_DB_PASSWORD}
+    volumes:
+      - report-service-postgres-data:/var/lib/postgresql/data
+      - ./src/main/resources/db/report-service:/docker-entrypoint-initdb.d
+    networks:
+      - leilao-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
   # ============================================================
   # TRANSACTION-SERVICE DATABASE
@@ -330,6 +533,56 @@ services:
       timeout: 5s
       retries: 10
       start_period: 30s
+
+  # ============================================================
+  # LISTING-SERVICE DATABASE
+  # ============================================================
+  listing-elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:9.4.2
+    container_name: listing-service-elastic
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+      - xpack.security.http.ssl.enabled=false
+    ports:
+      - "${LISTING_SERVICE_ELASTIC_PORT}:9200"
+    volumes:
+      - listing-elastic-data:/usr/share/elasticsearch/data
+    networks:
+      - leilao-network
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -s http://localhost:9200/_cluster/health | grep -q '\"status\":\"green\"'" ]
+      interval: 20s
+      timeout: 10s
+      retries: 10
+      start_period: 180s
+
+  # ============================================================
+  # REPORT-SERVICE
+  # ============================================================
+  report-service:
+    container_name: report-service
+    image: pedrovncs/report-service:latest
+    restart: always
+    ports:
+      - "${REPORT_SERVICE_PORT}:8081"
+    environment:
+      REPORT_SERVICE_PORT: ${REPORT_SERVICE_PORT}
+      SPRING_DATASOURCE_URL: "${SPRING_DATASOURCE_URL:-jdbc:postgresql://report-service-postgres:5432/report}"
+      REPORT_SERVICE_DB_USER: ${REPORT_SERVICE_DB_USER:-report}
+      REPORT_SERVICE_DB_PASSWORD: ${REPORT_SERVICE_DB_PASSWORD:-report}
+      KAFKA_SERVERS: "${KAFKA_BOOTSTRAP_SERVERS}"
+      EUREKA_SERVER_URL: ${EUREKA_SERVER_URL}
+      EUREKA_CLIENT_REGISTER_WITH_EUREKA: ${EUREKA_CLIENT_REGISTER_WITH_EUREKA}
+      EUREKA_CLIENT_FETCH_REGISTRY: ${EUREKA_CLIENT_FETCH_REGISTRY}
+    networks:
+      - leilao-network
+    depends_on:
+      report-service-postgres:
+        condition: service_healthy
+      kafka-init:
+        condition: service_completed_successfully
 
   # ============================================================
   # USER-SERVICE
@@ -375,7 +628,7 @@ services:
       kafka-init:
         condition: service_completed_successfully
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/actuator/health"]
+      test: [ "CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/actuator/health" ]
       interval: 30s
       timeout: 10s
       retries: 10
@@ -384,32 +637,85 @@ services:
   # ============================================================
   # NOTIFICATION-SERVICE
   # ============================================================
-  #  notification-service:
-  #    container_name: notification-service
-  #    image: notification-service
-  #    env_file:
-  #      - .env
-  #    ports:
-  #      - "8087:8081"
-  #    healthcheck:
-  #      test: [ "CMD-SHELL", "wget -qO- http://localhost:8081/actuator/health || exit 1" ]
-  #      interval: 20s
-  #      timeout: 10s
-  #      retries: 5
-  #      start_period: 40s
-  #    depends_on:
-  #      notificationdb:
-  #        condition: service_healthy
-  #      kafka-init:
-  #        condition: service_completed_successfully
-  #      kafka:
-  #        condition: service_healthy
-  #      eureka-server:
-  #        condition: service_healthy
-  #      ksqldb-init:
-  #        condition: service_completed_successfully
-  #    networks:
-  #      - leilao-network
+  notification-service:
+    container_name: notification-service
+    image: pedrovncs/notification-service:latest
+    env_file:
+      - .env
+    ports:
+      - "8087:8081"
+    healthcheck:
+      test: [ "CMD-SHELL", "wget -qO- http://localhost:8081/actuator/health || exit 1" ]
+      interval: 20s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+    depends_on:
+      notificationdb:
+        condition: service_healthy
+      kafka-init:
+        condition: service_completed_successfully
+      kafka:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+      ksqldb-init:
+        condition: service_completed_successfully
+    networks:
+      - leilao-network
+
+  # ============================================================
+  # REVIEW-SERVICE
+  # ============================================================
+  review-service:
+    container_name: review-service
+    image: gabrielmeruzzi/review-service:latest
+    restart: always
+    ports:
+      - "${REVIEW_SERVICE_PORT}:8084"
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      REVIEW_SERVICE_PORT: ${REVIEW_SERVICE_PORT}
+      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL_REVIEW}
+      REVIEW_SERVICE_DB_USER: ${REVIEW_SERVICE_DB_USER}
+      REVIEW_SERVICE_DB_PASSWORD: ${REVIEW_SERVICE_DB_PASSWORD}
+      KAFKA_SERVERS: ${KAFKA_BOOTSTRAP_SERVERS}
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      EUREKA_CLIENT_REGISTER_WITH_EUREKA: ${EUREKA_CLIENT_REGISTER_WITH_EUREKA}
+      EUREKA_CLIENT_FETCH_REGISTRY: ${EUREKA_CLIENT_FETCH_REGISTRY}
+    networks:
+      - leilao-network
+    depends_on:
+      review-postgres:
+        condition: service_healthy
+      kafka-init:
+        condition: service_completed_successfully
+  # ============================================================
+  # QA-SERVICE
+  # ============================================================
+  qa-service:
+    image: sylviocheleiro/qa-service:latest
+    container_name: qa-service
+    restart: unless-stopped
+    ports:
+      - "${QA_SERVICE_PORT}:8098"
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      QA_SERVICE_PORT: 8098
+      QA_SERVICE_DB_URL: jdbc:postgresql://postgres-qa:5432/qa_service_db
+      QA_SERVICE_DB_USER: ${QA_SERVICE_DB_USER}
+      QA_SERVICE_DB_PASSWORD: ${QA_SERVICE_DB_PASSWORD}
+      QA_SERVICE_REDIS_HOST: redis-qa
+      QA_SERVICE_REDIS_PORT: 6379
+    depends_on:
+      postgres-qa:
+        condition: service_healthy
+      kafka-init:
+        condition: service_completed_successfully
+      redis-qa:
+        condition: service_healthy
+    networks:
+      - leilao-network
 
   # ============================================================
   # TRANSACTION-SERVICE
@@ -421,7 +727,7 @@ services:
     ports:
       - "${TRANSACTION_SERVICE_PORT}:8080"
     environment:
-      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-dev}
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
       SPRING_DATASOURCE_URL: ${TRANSACTION_SERVICE_DB_URL}
       SPRING_DATASOURCE_USERNAME: ${TRANSACTION_SERVICE_DB_USER}
       SPRING_DATASOURCE_PASSWORD: ${TRANSACTION_SERVICE_DB_PASSWORD}
@@ -441,7 +747,7 @@ services:
       kafka-init:
         condition: service_completed_successfully
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/actuator/health"]
+      test: [ "CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/actuator/health" ]
       interval: 30s
       timeout: 10s
       retries: 10
@@ -450,56 +756,82 @@ services:
   # ============================================================
   # PAYMENT-SERVICE
   # ============================================================
-  #  payment-service:
-  #    image: payment-service
-  #    container_name: payment-service
-  #    env_file:
-  #      - .env
-  #    ports:
-  #      - "8180:8082"
-  #    healthcheck:
-  #      test: [ "CMD-SHELL", "wget -qO- http://localhost:8082/actuator/health || exit 1" ]
-  #      interval: 20s
-  #      timeout: 10s
-  #      retries: 5
-  #      start_period: 40s
-  #    depends_on:
-  #      paymentdb:
-  #        condition: service_healthy
-  #      kafka-init:
-  #        condition: service_completed_successfully
-  #    networks:
-  #      - leilao-network
-
-  # ============================================================
-  # API GATEWAY
-  # ============================================================
-  api-gateway:
-    container_name: api-gateway
-    image: shyuu7/api-gateway:latest
+  payment-service:
+    image: pedrovncs/payment-service:latest
+    container_name: payment-service
+    env_file:
+      - .env
     ports:
-      - "9999:9999"
-    networks:
-      - leilao-network
-    environment:
-      EUREKA_SERVER_URL: ${EUREKA_SERVER_URL}
-      KEYCLOAK_INTERNAL_URL: ${KEYCLOAK_INTERNAL_URL}
-      KEYCLOAK_EXTERNAL_URL: ${KEYCLOAK_EXTERNAL_URL}
-      KEYCLOAK_CLIENT_SECRET_API_GATEWAY: ${KEYCLOAK_CLIENT_SECRET_API_GATEWAY}
-      EUREKA_CLIENT_REGISTER_WITH_EUREKA: false
-      EUREKA_CLIENT_FETCH_REGISTRY: true
-      FRONTEND_URL: ${FRONTEND_URL}
-    restart: unless-stopped
+      - "8180:8082"
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:9999/actuator/health"]
-      interval: 30s
+      test: [ "CMD-SHELL", "wget -qO- http://localhost:8082/actuator/health || exit 1" ]
+      interval: 20s
       timeout: 10s
       retries: 5
+      start_period: 40s
+    depends_on:
+      paymentdb:
+        condition: service_healthy
+      kafka-init:
+        condition: service_completed_successfully
+    networks:
+      - leilao-network
+
+  # ============================================================
+  # LISTING-SERVICE
+  # ============================================================
+  listing-service:
+    image: pedrovncs/listing-service:latest
+    container_name: listing-service
+    ports:
+      - "${LISTING_SERVICE_PORT}:8080"
+    environment:
+      LISTING_SERVICE_PORT: ${LISTING_SERVICE_PORT}
+      LISTING_SERVICE_ELASTIC_URI: ${LISTING_SERVICE_ELASTIC_URI}
+      KAFKA_BOOTSTRAP_SERVER: ${KAFKA_BOOTSTRAP_SERVERS}
+      EUREKA_SERVER_URL: ${EUREKA_SERVER_URL}
+      EUREKA_CLIENT_REGISTER_WITH_EUREKA: ${EUREKA_CLIENT_REGISTER_WITH_EUREKA}
+      EUREKA_CLIENT_FETCH_REGISTRY: ${EUREKA_CLIENT_FETCH_REGISTRY}
+    healthcheck:
+      test: [ "CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/actuator/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 10
       start_period: 120s
     depends_on:
-      eureka-server:
+      listing-elasticsearch:
         condition: service_healthy
-      keycloak:
+      kafka-init:
+        condition: service_completed_successfully
+    networks:
+      - leilao-network
+
+  # ============================================================
+  # AUCTION-SERVICE
+  # ============================================================
+  auction-service:
+    image: pedrovncs/auction-service:latest
+    container_name: auction-service
+    ports:
+      - "${AUCTION_SERVICE_PORT}:8080"
+    environment:
+      AUCTION_SERVICE_S3_ENDPOINT: ${AUCTION_SERVICE_S3_ENDPOINT}
+      S3_ACCESS_KEY: ${S3_ACCESS_KEY}
+      S3_SECRET_KEY: ${S3_SECRET_KEY}
+      S3_REGION: us-east-fake
+      AUCTION_SERVICE_S3_BUCKET_NAME: ${AUCTION_SERVICE_S3_BUCKET_NAME}
+      AUCTION_SERVICE_POSTGRES_USER: ${AUCTION_SERVICE_POSTGRES_USER}
+      AUCTION_SERVICE_POSTGRES_PASSWORD: ${AUCTION_SERVICE_POSTGRES_PASSWORD}
+      AUCTION_SERVICE_POSTGRES_HOST: auction-service-postgres
+      AUCTION_SERVICE_PORT: ${AUCTION_SERVICE_PORT}
+      KAFKA_BOOTSTRAP_SERVER: ${KAFKA_BOOTSTRAP_SERVERS}
+      EUREKA_CLIENT_REGISTER_WITH_EUREKA: ${EUREKA_CLIENT_REGISTER_WITH_EUREKA}
+      EUREKA_CLIENT_FETCH_REGISTRY: ${EUREKA_CLIENT_FETCH_REGISTRY}
+      EUREKA_SERVER_URL: ${EUREKA_SERVER_URL}
+    depends_on:
+      auction-postgres:
         condition: service_healthy
-      user-service:
-        condition: service_healthy
+      kafka-init:
+        condition: service_completed_successfully
+    networks:
+      - leilao-network
