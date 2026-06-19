@@ -451,7 +451,7 @@ services:
   # ============================================================
   redis-qa:
     image: redis:8.8.0-alpine
-    container_name: qa_service_redis
+    container_name: qa-service-redis
     ports:
       - "${QA_SERVICE_REDIS_PORT}:6379"
     volumes:
