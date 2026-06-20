@@ -2702,7 +2702,7 @@
     "saml.signature.algorithm": "",
     "parRequestUriLifespan": "60",
     "clientSessionMaxLifespan": "0",
-    "frontendUrl": "",
+    "frontendUrl": "http://localhost:8081",
     "scimApiEnabled": "false",
     "acr.loa.map": "{}",
     "shortVerificationUri": "",
