@@ -81,20 +81,18 @@ services:
   # KAFKA INIT
   # ============================================================
   kafka-init:
-    image: apache/kafka:4.3.0
-    container_name: kafka-init
-    networks:
-      - leilao-network
-    restart: on-failure
+    container_name: kafka-init-python
+    image: pedrovncs/kafka-init-python:latest
     depends_on:
       kafka:
         condition: service_healthy
       eureka-server:
         condition: service_healthy
-    volumes:
-      - ./config/topics.txt:/config/topics.txt
-      - ./config/create-topics.sh:/config/create-topics.sh
-    entrypoint: [ "/bin/sh", "/config/create-topics.sh" ]
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+    restart: "no"
+    networks:
+      - leilao-network
 
   # ============================================================
   # KAFKA UI
