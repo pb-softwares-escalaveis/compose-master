@@ -305,6 +305,23 @@ services:
         condition: service_healthy
 
   # ============================================================
+  # FRONTEND
+  # ============================================================
+  frontend:
+    image: nginx:alpine
+    container_name: leilao-frontend
+    ports:
+      - "3000:80"
+    volumes:
+      - ./frontend:/usr/share/nginx/html:ro
+      - ./frontend/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    restart: unless-stopped
+    depends_on:
+      - api-gateway
+    networks:
+      - leilao-network
+
+  # ============================================================
   # USER-SERVICE REDIS
   # ============================================================
   user-service-redis:

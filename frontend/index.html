@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=980">
+  <title>O Leiloeiro Online - Leilões na Internet</title>
+  <link rel="stylesheet" href="css/estilo.css">
+</head>
+<body>
+  <div class="pagina">
+    <div id="topo"></div>
+
+    <table class="layout"><tbody><tr>
+      <!-- Coluna lateral -->
+      <td class="coluna-lateral">
+        <div class="caixa">
+          <div class="titulo">📂 Categorias</div>
+          <div class="corpo" id="lista-categorias">Carregando...</div>
+        </div>
+        <div class="caixa">
+          <div class="titulo">⏰ Encerrando em breve</div>
+          <div class="corpo">
+            <a class="botao" href="busca.html?endingSoon=true">Ver lotes que encerram hoje &raquo;</a>
+          </div>
+        </div>
+        <div class="caixa">
+          <div class="titulo">💡 Dica do dia</div>
+          <div class="corpo dica">
+            Cadastre-se gratuitamente e dê seu primeiro lance! Quanto antes você
+            participa, maiores as chances de arrematar.
+          </div>
+        </div>
+      </td>
+
+      <!-- Conteúdo principal -->
+      <td class="conteudo">
+        <div class="caixa">
+          <div class="titulo">🌟 Lotes em Destaque (mais recentes)</div>
+          <div class="corpo">
+            <div id="ultimos-lotes" class="grade-lotes">
+              <span class="carregando">Carregando os últimos lotes...</span>
+            </div>
+            <div class="centro" style="margin-top:8px">
+              <a class="botao botao-grande" href="busca.html">🔍 Ver todos os lotes</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="caixa">
+          <div class="titulo">👍 Recomendados para você</div>
+          <div class="corpo">
+            <div id="recomendados" class="grade-lotes">
+              <span class="dica">As recomendações personalizadas aparecerão aqui em breve.</span>
+            </div>
+          </div>
+        </div>
+      </td>
+    </tr></tbody></table>
+
+    <div id="rodape"></div>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/home.js"></script>
+</body>
+</html>

@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="170" height="120" viewBox="0 0 170 120">
+  <rect width="170" height="120" fill="#e0e0e0" stroke="#808080"/>
+  <text x="85" y="55" font-family="Verdana" font-size="40" text-anchor="middle">🖼️</text>
+  <text x="85" y="85" font-family="Verdana" font-size="11" fill="#606060" text-anchor="middle">sem imagem</text>
+</svg>

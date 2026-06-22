@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=980">
+  <title>Entrar - O Leiloeiro Online</title>
+  <link rel="stylesheet" href="css/estilo.css">
+</head>
+<body>
+  <div class="pagina">
+    <div id="topo"></div>
+
+    <div class="caixa" style="max-width:480px;margin:20px auto">
+      <div class="titulo">🔑 Entrar na sua conta</div>
+      <div class="corpo centro">
+        <p>O login é feito com segurança pelo nosso sistema de autenticação
+           (<b>Keycloak</b>). Ao clicar no botão abaixo você será levado à
+           página oficial de login e, em seguida, retornará ao site.</p>
+
+        <p style="margin:18px 0">
+          <button type="button" id="btn-login" class="botao-grande botao-lance">
+            🔑 Entrar com Keycloak
+          </button>
+        </p>
+
+        <p class="dica">
+          Você será redirecionado para o servidor de autenticação e voltará
+          automaticamente após confirmar suas credenciais.
+        </p>
+
+        <hr>
+        <p>Ainda não tem conta? <a href="cadastro.html">Cadastre-se aqui »</a></p>
+      </div>
+    </div>
+
+    <div id="rodape"></div>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/ui.js"></script>
+  <script>
+    UI.iniciarPagina("login.html");
+    document.getElementById("btn-login").addEventListener("click", function () {
+      // Redireciona o navegador para iniciar o fluxo OAuth2 do gateway,
+      // que por sua vez leva ao Keycloak (com seus redirects).
+      AUTH.login();
+    });
+  </script>
+</body>
+</html>

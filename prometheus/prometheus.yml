@@ -1,0 +1,54 @@
+global:
+  scrape_interval: 5s
+  evaluation_interval: 5s
+
+scrape_configs:
+  - job_name: 'notification-service'
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ['host.docker.internal:8087']
+
+  - job_name: 'payment-service'
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ['host.docker.internal:8180']
+
+  - job_name: 'user-service'
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ['host.docker.internal:7000']
+
+  - job_name: 'api-gateway'
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ['host.docker.internal:9999']
+
+#  - job_name: 'transaction-service'
+#    metrics_path: /actuator/prometheus
+#    static_configs:
+#      - targets: [ 'host.docker.internal:8082' ]
+#
+#  - job_name: 'qa-service'
+#    metrics_path: /actuator/prometheus
+#    static_configs:
+#      - targets: [ 'host.docker.internal:3620' ]
+#
+#  - job_name: 'auction-service'
+#    metrics_path: /actuator/prometheus
+#    static_configs:
+#      - targets: [ 'host.docker.internal:6045' ]
+#
+#  - job_name: 'report-service'
+#    metrics_path: /actuator/prometheus
+#    static_configs:
+#      - targets: [ 'host.docker.internal:4152' ]
+#
+#  - job_name: 'review-service'
+#    metrics_path: /actuator/prometheus
+#    static_configs:
+#      - targets: [ 'host.docker.internal:4100' ]
+#
+#  - job_name: 'listing-service'
+#    metrics_path: /actuator/prometheus
+#    static_configs:
+#      - targets: [ 'host.docker.internal:9101' ]

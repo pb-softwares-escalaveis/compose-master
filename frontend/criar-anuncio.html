@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=980">
+  <title>Criar Anúncio - O Leiloeiro Online</title>
+  <link rel="stylesheet" href="css/estilo.css">
+</head>
+<body>
+  <div class="pagina">
+    <div id="topo"></div>
+
+    <div class="caixa">
+      <div class="titulo">➕ Criar novo anúncio (Lote)</div>
+      <div class="corpo">
+        <p>Preencha os detalhes do seu item para iniciar um leilão. Os lances começarão a partir do valor inicial que você definir.</p>
+        
+        <form id="form-anuncio" autocomplete="off">
+          <fieldset class="bloco-passo">
+            <label for="titulo">Título do Anúncio * <span class="dica">(máx. 100 caracteres)</span></label>
+            <input type="text" id="titulo" maxlength="100" required>
+            
+            <label for="categoria">Categoria *</label>
+            <select id="categoria" required>
+              <option value="">-- Selecione uma categoria --</option>
+              <!-- Preenchido via JS -->
+            </select>
+
+            <label for="descricao">Descrição *</label>
+            <textarea id="descricao" rows="5" required style="width: 100%; font-family: Tahoma, Arial, sans-serif;"></textarea>
+
+            <label for="preco-inicial">Lance Inicial (R$) *</label>
+            <input type="number" id="preco-inicial" min="1" step="0.01" placeholder="0.00" required>
+
+            <label for="compre-ja">Preço "Compre Agora" (R$) <span class="dica">(opcional)</span></label>
+            <input type="number" id="compre-ja" min="1" step="0.01" placeholder="0.00">
+
+            <label for="duracao">Duração do Leilão * <span class="dica">(entre 1 e 7 dias)</span></label>
+            <input type="number" id="duracao" min="1" max="7" value="7" required>
+
+            <label for="imagem">Foto Principal do Item * <span class="dica">(JPG, PNG)</span></label>
+            <input type="file" id="imagem" accept="image/jpeg, image/png, image/webp" required>
+          </fieldset>
+
+          <div id="msg-anuncio"></div>
+
+          <div style="margin-top:10px">
+            <button type="submit" id="btn-salvar">✔ Publicar Anúncio</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div id="rodape"></div>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/criar-anuncio.js"></script>
+</body>
+</html>

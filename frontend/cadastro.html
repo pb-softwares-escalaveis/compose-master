@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=980">
+  <title>Cadastro - O Leiloeiro Online</title>
+  <link rel="stylesheet" href="css/estilo.css">
+</head>
+<body>
+  <div class="pagina">
+    <div id="topo"></div>
+
+    <div class="caixa">
+      <div class="titulo">📝 Criar nova conta</div>
+      <div class="corpo">
+        <div class="passos">
+          <div class="passo ativo" data-passo="1">1. Dados Pessoais</div>
+          <div class="passo" data-passo="2">2. Endereço</div>
+          <div class="passo" data-passo="3">3. Acesso</div>
+          <div class="passo" data-passo="4">4. Confirmação</div>
+        </div>
+
+        <form id="form-cadastro" autocomplete="off">
+
+          <!-- PASSO 1: Dados pessoais -->
+          <fieldset class="bloco-passo" data-passo="1">
+            <label for="nome">Nome *</label>
+            <input type="text" id="nome" minlength="2" maxlength="50" required>
+            <label for="sobrenome">Sobrenome *</label>
+            <input type="text" id="sobrenome" minlength="2" maxlength="50" required>
+            <label for="cpf">CPF * <span class="dica">(somente números, 11 dígitos)</span></label>
+            <input type="text" id="cpf" maxlength="14" placeholder="000.000.000-00" required>
+            <label for="dataNascimento">Data de nascimento * <span class="dica">(mínimo 18 anos)</span></label>
+            <input type="date" id="dataNascimento" required>
+            <label for="telefone">Telefone * <span class="dica">(DDD + número, 10 ou 11 dígitos)</span></label>
+            <input type="tel" id="telefone" placeholder="(11) 98888-7777" required>
+            <label for="email">E-mail *</label>
+            <input type="email" id="email" required>
+          </fieldset>
+
+          <!-- PASSO 2: Endereço -->
+          <fieldset class="bloco-passo" data-passo="2" style="display:none">
+            <label for="cep">CEP * <span class="dica">(formato 00000-000)</span></label>
+            <input type="text" id="cep" maxlength="9" placeholder="00000-000" required>
+            <label for="pais">País *</label>
+            <input type="text" id="pais" maxlength="100" value="Brasil" required>
+            <label for="estado">Estado (UF) *</label>
+            <input type="text" id="estado" maxlength="100" placeholder="SP" required>
+            <label for="cidade">Cidade *</label>
+            <input type="text" id="cidade" maxlength="150" required>
+            <label for="bairro">Bairro *</label>
+            <input type="text" id="bairro" maxlength="150" required>
+            <label for="rua">Rua / Logradouro *</label>
+            <input type="text" id="rua" maxlength="255" required>
+            <label for="numero">Número</label>
+            <input type="text" id="numero" maxlength="10">
+            <label for="complemento">Complemento</label>
+            <input type="text" id="complemento" maxlength="50">
+          </fieldset>
+
+          <!-- PASSO 3: Acesso -->
+          <fieldset class="bloco-passo" data-passo="3" style="display:none">
+            <label for="username">Nome de usuário * <span class="dica">(4 a 50 caracteres)</span></label>
+            <input type="text" id="username" minlength="4" maxlength="50" required>
+            <div id="sugestoes-username" class="dica"></div>
+            <label for="senha">Senha * <span class="dica">(mínimo 8 caracteres)</span></label>
+            <input type="password" id="senha" minlength="8" required>
+            <label for="senha2">Confirme a senha *</label>
+            <input type="password" id="senha2" minlength="8" required>
+          </fieldset>
+
+          <!-- PASSO 4: Confirmação -->
+          <fieldset class="bloco-passo" data-passo="4" style="display:none">
+            <p>Confira seus dados antes de finalizar:</p>
+            <div id="resumo-cadastro"></div>
+          </fieldset>
+
+          <div id="msg-cadastro"></div>
+
+          <div style="margin-top:10px">
+            <button type="button" id="btn-voltar" style="display:none">&laquo; Voltar</button>
+            <button type="button" id="btn-avancar">Avançar &raquo;</button>
+            <button type="submit" id="btn-finalizar" style="display:none">✔ Finalizar cadastro</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div id="rodape"></div>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/cadastro.js"></script>
+</body>
+</html>

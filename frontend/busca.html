@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=980">
+  <title>Buscar Lotes - O Leiloeiro Online</title>
+  <link rel="stylesheet" href="css/estilo.css">
+</head>
+<body>
+  <div class="pagina">
+    <div id="topo"></div>
+
+    <table class="layout"><tbody><tr>
+      <!-- Filtros -->
+      <td class="coluna-lateral">
+        <form id="form-busca" class="caixa" autocomplete="off">
+          <div class="titulo">🔍 Filtros de Busca</div>
+          <div class="corpo">
+            <label for="q">Palavra-chave</label>
+            <input type="text" id="q" name="q" placeholder="Ex.: bicicleta, notebook...">
+            <div id="sugestoes" style="position:relative"></div>
+
+            <label for="category">Categoria</label>
+            <select id="category" name="category"></select>
+
+            <label for="minPrice">Preço mínimo (R$)</label>
+            <input type="number" id="minPrice" name="minPrice" min="0" step="0.01">
+
+            <label for="maxPrice">Preço máximo (R$)</label>
+            <input type="number" id="maxPrice" name="maxPrice" min="0" step="0.01">
+
+            <label><input type="checkbox" id="endingSoon" name="endingSoon" style="width:auto"> Encerrando em 24h</label>
+
+            <label for="sortBy">Ordenar por</label>
+            <select id="sortBy" name="sortBy"></select>
+
+            <label for="sortDir">Direção</label>
+            <select id="sortDir" name="sortDir">
+              <option value="DESC">Decrescente</option>
+              <option value="ASC">Crescente</option>
+            </select>
+
+            <label for="size">Itens por página</label>
+            <select id="size" name="size">
+              <option value="5">5</option>
+              <option value="10">10</option>
+              <option value="20" selected>20</option>
+              <option value="50">50</option>
+            </select>
+
+            <div style="margin-top:8px">
+              <button type="submit" class="botao-grande">Buscar</button>
+              <button type="button" id="btn-limpar">Limpar</button>
+            </div>
+          </div>
+        </form>
+      </td>
+
+      <!-- Resultados -->
+      <td class="conteudo">
+        <div class="caixa">
+          <div class="titulo">📋 Resultados</div>
+          <div class="corpo">
+            <div id="resumo" class="dica"></div>
+            <div id="paginacao-topo" class="paginacao"></div>
+            <div id="resultados" class="grade-lotes">
+              <span class="dica">Use os filtros ao lado e clique em "Buscar".</span>
+            </div>
+            <div id="paginacao-base" class="paginacao"></div>
+          </div>
+        </div>
+      </td>
+    </tr></tbody></table>
+
+    <div id="rodape"></div>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/busca.js"></script>
+</body>
+</html>
