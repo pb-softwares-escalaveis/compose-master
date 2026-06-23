@@ -35,7 +35,13 @@
       // seller-info traz nome completo e localização (também público).
       let seller = null;
       try { seller = await API.sellerInfo(uuid); } catch (_) { /* opcional */ }
-      renderizar(uuid, perfil, seller);
+      
+      let payments = null;
+      if (ehProprioPerfil) {
+        try { payments = await API.getPayments(uuid); } catch (_) { /* opcional */ }
+      }
+
+      renderizar(uuid, perfil, seller, payments);
     } catch (e) {
       root.innerHTML = '<div class="caixa"><div class="titulo">Perfil</div>' +
         '<div class="corpo mensagem-erro">Não foi possível carregar este perfil: ' +
@@ -43,7 +49,7 @@
     }
   }
 
-  function renderizar(uuid, perfil, seller) {
+  function renderizar(uuid, perfil, seller, payments) {
     const nomeCompleto = seller ? [seller.nome, seller.sobrenome].filter(Boolean).join(" ") : "";
     const local = seller ? [seller.cidade, seller.estado, seller.pais].filter(Boolean).join(", ") : "";
 
@@ -55,7 +61,7 @@
         ? perfil.reputacao
         : (seller ? seller.nota : null);
 
-    root.innerHTML = '' +
+    let html = '' +
         '<table class="layout"><tbody><tr>' +
         '<td class="coluna-lateral">' +
         '<div class="caixa"><div class="titulo">' + (ehProprioPerfil ? '👤 Meu Perfil' : '👤 Perfil') + '</div>' +
@@ -83,10 +89,63 @@
         '</table>' +
         (ehProprioPerfil ? '<p class="dica">Para alterar dados sensíveis (e-mail, telefone, endereço) ' +
             'utilize as opções da sua conta. Estas informações privadas não são exibidas publicamente.</p>' : '') +
-        '</div></div>' +
+        '</div></div>';
 
-        '</td>' +
-        '</tr></tbody></table>';
+    if (ehProprioPerfil) {
+      html += '<div class="caixa" style="margin-top:15px"><div class="titulo">💳 Meus Pagamentos</div><div class="corpo">';
+      if (!payments || payments.length === 0) {
+        html += '<span class="dica">Nenhum pagamento encontrado.</span>';
+      } else {
+        html += '<table class="tabela-dados" style="width: 100%; text-align: left;">' +
+                '<tr><th>ID</th><th>Lote</th><th>Valor</th><th>Status</th><th>Ação</th></tr>';
+        payments.forEach(function(p) {
+          const statusStr = UI.esc(p.status);
+          let acaoHtml = "-";
+          if ((p.status === "PENDING" || p.status === "WAITING_PAYMENT") && p.id) {
+            acaoHtml = '<button type="button" class="btn-simular-pgto" data-pid="' + UI.esc(p.id) + '" style="font-size:0.8em; padding: 3px 8px; cursor: pointer;">Pagar (Simular)</button>';
+          }
+          let idStr = p.id ? String(p.id).substring(0, 8) + "..." : "N/A";
+          let valorNum = p.amountInCents ? (p.amountInCents / 100) : 0;
+          
+          html += '<tr>' +
+                  '<td><span title="' + UI.esc(p.id) + '" style="cursor:help;">' + UI.esc(idStr) + '</span></td>' +
+                  '<td>' + UI.esc(p.auctionId) + '</td>' +
+                  '<td>' + UI.dinheiro(valorNum) + '</td>' +
+                  '<td>' + statusStr + '</td>' +
+                  '<td>' + acaoHtml + '</td>' +
+                  '</tr>';
+        });
+        html += '</table><div id="msg-pgto" style="margin-top:10px;"></div>';
+      }
+      html += '</div></div>';
+    }
+
+    html += '</td></tr></tbody></table>';
+    root.innerHTML = html;
+    
+    if (ehProprioPerfil) {
+       ligarPagamentos();
+    }
+  }
+
+  function ligarPagamentos() {
+    const btns = document.querySelectorAll(".btn-simular-pgto");
+    btns.forEach(function (btn) {
+      btn.addEventListener("click", async function () {
+        const pid = this.getAttribute("data-pid");
+        const msg = document.getElementById("msg-pgto");
+        msg.innerHTML = '<span class="carregando">Simulando pagamento...</span>';
+        this.disabled = true;
+        try {
+          await API.simulatePayment(pid);
+          msg.innerHTML = '<span class="mensagem-ok">Pagamento simulado com sucesso! Atualizando...</span>';
+          setTimeout(function() { window.location.reload(); }, 1500);
+        } catch (e) {
+          msg.innerHTML = '<span class="mensagem-erro">Falha ao simular: ' + UI.esc(e.message) + '</span>';
+          this.disabled = false;
+        }
+      });
+    });
   }
 
   function linha(rotulo, valor) {

@@ -115,7 +115,7 @@
     montarAreaLance(status);
     if (sellerId) carregarVendedor(sellerId);
     if (lances) montarHistorico(lances);
-    carregarPerguntas();
+    carregarPerguntas(sellerId);
   }
 
   function linha(rotulo, valor) {
@@ -184,15 +184,31 @@
   async function carregarVendedor(sellerId) {
     const el = document.getElementById("vendedor");
     try {
-      const v = await API.sellerInfo(sellerId);
+      let perfil = null;
+      let v = null;
+      try { perfil = await API.profile(sellerId); } catch (e) {}
+      try { v = await API.sellerInfo(sellerId); } catch (e) {}
+
+      if (!perfil && !v) throw new Error("Falha ao carregar vendedor");
+
+      perfil = perfil || {};
+      v = v || {};
+
       const nome = [v.nome, v.sobrenome].filter(Boolean).join(" ");
       const local = [v.cidade, v.estado, v.pais].filter(Boolean).join(", ");
+      
+      let foto = perfil.profilePicture || v.profilePicture || v.fotoPerfil || v.foto || "";
+      if (foto) foto = foto.replace(/^"|"$/g, '');
+
+      let username = perfil.username || v.username;
+      let nota = (perfil.reputacao !== undefined && perfil.reputacao !== null) ? perfil.reputacao : v.nota;
+
       el.innerHTML =
-        (v.fotoPerfil ? '<div class="centro"><img src="' + UI.esc(v.fotoPerfil) + '" style="width:60px;height:60px;border-radius:50%;border:2px solid #808080" onerror="this.style.display=\'none\'"></div>' : '') +
+        (foto ? '<div class="centro"><img src="' + UI.esc(foto) + '" style="width:60px;height:60px;border-radius:50%;border:2px solid #808080" onerror="this.style.display=\'none\'"></div>' : '') +
         '<table class="tabela-dados">' +
-        (v.username ? linha("Usuário", UI.esc(v.username)) : "") +
+        (username ? linha("Usuário", UI.esc(username)) : "") +
         (nome ? linha("Nome", UI.esc(nome)) : "") +
-        (v.nota !== undefined && v.nota !== null ? linha("Reputação", "⭐ " + UI.esc(v.nota)) : "") +
+        (nota !== undefined && nota !== null ? linha("Reputação", "⭐ " + UI.esc(nota)) : "") +
         (local ? linha("Localização", UI.esc(local)) : "") +
         '</table>' +
         '<a class="botao" href="perfil.html?id=' + encodeURIComponent(sellerId) + '">Ver perfil do vendedor</a>';
@@ -213,7 +229,7 @@
       }).join("") + '</table>';
   }
 
-  async function carregarPerguntas() {
+  async function carregarPerguntas(sellerId) {
     const el = document.getElementById("qa");
     let perguntas;
     try {
@@ -228,34 +244,71 @@
     if (!lista.length) {
       html = '<span class="dica">Nenhuma pergunta ainda. Seja o primeiro a perguntar!</span>';
     } else {
+      const uLogado = AUTH.getUsuario();
+      const ehVendedor = (uLogado && sellerId && uLogado.userId === sellerId);
+      
       html = lista.map(function (p) {
+        const qid = pega(p, ["id", "questionId"], "");
         const texto = pega(p, ["question", "text", "pergunta", "content"], "");
         const autor = pega(p, ["username", "author", "autor", "askedBy"], "Usuário");
         const quando = pega(p, ["createdAt", "date", "data"], null);
-        const respostas = pega(p, ["answers", "respostas"], null);
+        
+        const respostasArray = pega(p, ["answers", "respostas"], null);
+        const respostaUnica = pega(p, ["answer", "resposta", "reply"], null);
+        
         let respHtml = "";
-        if (Array.isArray(respostas)) {
-          respHtml = respostas.map(function (r) {
-            const rt = pega(r, ["answer", "text", "resposta", "content"], "");
-            const ra = pega(r, ["username", "author", "autor", "answeredBy"], "Vendedor");
-            return '<div class="resposta"><b>' + UI.esc(ra) + ':</b> ' + UI.esc(rt) + '</div>';
+        
+        if (Array.isArray(respostasArray)) {
+          respHtml += respostasArray.map(function (r) {
+            const rt = typeof r === "string" ? r : pega(r, ["answer", "text", "resposta", "content"], "");
+            const ra = typeof r === "string" ? "Vendedor" : pega(r, ["username", "author", "autor", "answeredBy"], "Vendedor");
+            return '<div class="resposta" style="margin-left: 15px; border-left: 2px solid #ccc; padding-left: 10px;"><b>' + UI.esc(ra) + ':</b> ' + UI.esc(rt) + '</div>';
           }).join("");
         }
-        return '<div class="pergunta">' +
+        
+        if (respostaUnica && (!Array.isArray(respostaUnica) || respostaUnica.length > 0)) {
+          const rt = typeof respostaUnica === "string" ? respostaUnica : pega(respostaUnica, ["answer", "text", "resposta", "content", "reply"], "");
+          const ra = typeof respostaUnica === "string" ? "Vendedor" : pega(respostaUnica, ["username", "author", "autor", "answeredBy", "user"], "Vendedor");
+          
+          if (rt) {
+             respHtml += '<div class="resposta" style="margin-left: 15px; border-left: 2px solid #ccc; padding-left: 10px;"><b>' + UI.esc(ra) + ':</b> ' + UI.esc(rt) + '</div>';
+          }
+        }
+        
+        let areaResposta = "";
+        // Só exibe a caixa de resposta se o vendedor estiver logado e ainda NÃO houver resposta
+        if (ehVendedor && qid && !respHtml) {
+          areaResposta = '<div style="margin-top: 4px; margin-left: 15px;">' +
+            '<a href="javascript:void(0)" id="link-abrir-' + UI.esc(qid) + '" class="link-abrir-resposta" data-qid="' + UI.esc(qid) + '" style="font-size: 0.9em; text-decoration: none; color: #0066cc;">[responder]</a>' +
+            '<div id="caixa-resposta-' + UI.esc(qid) + '" class="caixa-resposta" style="display: none; margin-top: 8px;">' +
+            '<div style="text-align: right;"><a href="javascript:void(0)" class="link-fechar-resposta" data-qid="' + UI.esc(qid) + '" style="color: red; font-weight: bold; text-decoration: none; font-size: 1.1em;" title="Cancelar">✖</a></div>' +
+            '<textarea id="nova-resposta-' + UI.esc(qid) + '" rows="2" placeholder="Escreva sua resposta..." style="width: 100%;"></textarea>' +
+            '<button type="button" class="btn-responder" data-qid="' + UI.esc(qid) + '" style="margin-top:4px">Enviar Resposta</button>' +
+            '<div id="msg-resposta-' + UI.esc(qid) + '"></div>' +
+            '</div></div>';
+        }
+
+        return '<div class="pergunta" style="margin-bottom: 15px;">' +
           '<div><b>' + UI.esc(autor) + '</b> perguntou:</div>' +
           '<div>' + UI.esc(texto) + '</div>' +
-          '<div class="meta">' + UI.data(quando) + '</div>' +
+          '<div class="meta" style="font-size: 0.85em; color: #666;">' + UI.data(quando) + '</div>' +
           respHtml +
+          areaResposta +
           '</div>';
-      }).join("");
+      }).join("<hr style='border: 0; border-top: 1px solid #eee;'/>");
     }
-    el.innerHTML = html + caixaPerguntar();
+    el.innerHTML = html + caixaPerguntar(sellerId);
     ligarPerguntar();
+    ligarRespostas(sellerId);
   }
 
-  function caixaPerguntar() {
+  function caixaPerguntar(sellerId) {
     if (!AUTH.estaIdentificado()) {
       return '<hr><span class="dica">Faça <a href="login.html">login</a> para enviar uma pergunta ao vendedor.</span>';
+    }
+    const uLogado = AUTH.getUsuario();
+    if (uLogado && sellerId && uLogado.userId === sellerId) {
+      return '<hr><span class="dica">Você é o vendedor deste lote.</span>';
     }
     return '<hr>' +
       '<label for="nova-pergunta">Faça uma pergunta ao vendedor</label>' +
@@ -275,10 +328,53 @@
       try {
         await API.askQuestion(id, { question: texto, text: texto, content: texto });
         msg.innerHTML = '<span class="mensagem-ok">Pergunta enviada!</span>';
-        setTimeout(carregarPerguntas, 1000);
+        setTimeout(function() { window.location.reload(); }, 1000);
       } catch (e) {
         msg.innerHTML = '<span class="mensagem-erro">Não foi possível enviar: ' + UI.esc(e.message) + '</span>';
       }
+    });
+  }
+
+  function ligarRespostas(sellerId) {
+    const links = document.querySelectorAll(".link-abrir-resposta");
+    links.forEach(function (link) {
+      link.addEventListener("click", function () {
+        const qid = this.getAttribute("data-qid");
+        const caixa = document.getElementById("caixa-resposta-" + qid);
+        if (caixa.style.display === "none") {
+          caixa.style.display = "block";
+          this.style.display = "none";
+        }
+      });
+    });
+
+    const linksFechar = document.querySelectorAll(".link-fechar-resposta");
+    linksFechar.forEach(function (link) {
+      link.addEventListener("click", function () {
+        const qid = this.getAttribute("data-qid");
+        const caixa = document.getElementById("caixa-resposta-" + qid);
+        const linkAbrir = document.getElementById("link-abrir-" + qid);
+        if (caixa) caixa.style.display = "none";
+        if (linkAbrir) linkAbrir.style.display = "inline";
+      });
+    });
+
+    const btns = document.querySelectorAll(".btn-responder");
+    btns.forEach(function (btn) {
+      btn.addEventListener("click", async function () {
+        const qid = this.getAttribute("data-qid");
+        const msg = document.getElementById("msg-resposta-" + qid);
+        const texto = document.getElementById("nova-resposta-" + qid).value.trim();
+        if (!texto) { msg.innerHTML = '<span class="mensagem-erro">Escreva sua resposta.</span>'; return; }
+        msg.innerHTML = '<span class="carregando">Enviando...</span>';
+        try {
+          await API.answerQuestion(qid, { answer: texto, text: texto, content: texto });
+          msg.innerHTML = '<span class="mensagem-ok">Resposta enviada!</span>';
+          setTimeout(function() { window.location.reload(); }, 1000);
+        } catch (e) {
+          msg.innerHTML = '<span class="mensagem-erro">Não foi possível enviar: ' + UI.esc(e.message) + '</span>';
+        }
+      });
     });
   }
 })();

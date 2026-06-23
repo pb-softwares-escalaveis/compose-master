@@ -120,6 +120,18 @@
     },
     askQuestion: function (auctionId, body) {
       return request("/api/qa/auctions/" + encodeURIComponent(auctionId) + "/questions", { method: "POST", body: body });
+    },
+    answerQuestion: function (questionId, body) {
+      return request("/api/qa/questions/" + encodeURIComponent(questionId) + "/answers", { method: "POST", body: body });
+    },
+
+    // ---------- PAYMENT-SERVICE ----------
+    getPayments: function (userId) {
+      return request("/payments/bidder/" + encodeURIComponent(userId));
+    },
+    simulatePayment: function (providerPaymentId) {
+      // Usamos a rota que o Gateway suporta
+      return request("/simulate/" + encodeURIComponent(providerPaymentId), { method: "POST" });
     }
   };
 })();
