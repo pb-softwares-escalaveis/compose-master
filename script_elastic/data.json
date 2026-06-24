@@ -1,0 +1,1276 @@
+{
+  "index_name": "listing-lots",
+  "total_docs": 1000,
+  "statuses": [
+    "PENDING_REVIEW",
+    "ACTIVE",
+    "EXPIRED",
+    "SOLD",
+    "REMOVED",
+    "CANCELED",
+    "REJECTED"
+  ],
+  "image_list": [
+    "elastic-teste/banana2.jpg",
+    "elastic-teste/bananadrive.jpg",
+    "elastic-teste/bananadrive.jpg",
+    "elastic-teste/extintor.jpg",
+    "elastic-teste/havaianas.jpg",
+    "elastic-teste/iroman.jpg",
+    "elastic-teste/matrioska.jpg",
+    "elastic-teste/ketchup.jpg",
+    "elastic-teste/m&m.jpg",
+    "elastic-teste/mlp.jpg",
+    "elastic-teste/nesquik.jpg",
+    "elastic-teste/yoda.jpg",
+    "elastic-teste/patyplus.jpg",
+    "elastic-teste/yoda.jpg"
+  ],
+  "category_data": {
+    "ELECTRONICS": {
+      "items": [
+        [
+          "Smartphone Samsung Galaxy S23 Ultra 256GB",
+          1800,
+          6500
+        ],
+        [
+          "Notebook Dell XPS 15 i7 32GB RAM",
+          4500,
+          12000
+        ],
+        [
+          "Smart TV LG OLED 55\" 4K",
+          2500,
+          8000
+        ],
+        [
+          "Câmera Mirrorless Sony Alpha A7 IV",
+          6000,
+          15000
+        ],
+        [
+          "iPad Pro 12.9\" M2 512GB WiFi + Cellular",
+          3500,
+          9000
+        ],
+        [
+          "Fone de Ouvido Bose QuietComfort 45",
+          600,
+          2000
+        ],
+        [
+          "Drone DJI Mini 3 Pro com RC",
+          3000,
+          7500
+        ],
+        [
+          "Console PlayStation 5 + 2 Controles",
+          2500,
+          5000
+        ],
+        [
+          "Projetor Epson 4K HDR 3000 Lumens",
+          4000,
+          11000
+        ],
+        [
+          "Impressora 3D Bambu Lab X1 Carbon",
+          5000,
+          14000
+        ],
+        [
+          "Monitor Ultrawide LG 34\" Curvo 144Hz",
+          1800,
+          5500
+        ],
+        [
+          "Caixa de Som JBL Xtreme 3 Portátil",
+          500,
+          1800
+        ],
+        [
+          "Câmera de Segurança Hikvision Kit 8 canais",
+          1200,
+          4000
+        ],
+        [
+          "Tablet Wacom Cintiq 22 Gráfico",
+          3000,
+          8500
+        ],
+        [
+          "Apple Watch Series 9 45mm GPS",
+          1500,
+          4500
+        ]
+      ],
+      "desc_templates": [
+        "Equipamento em {condition}. {detail} Acompanha todos os acessórios originais, caixa e nota fiscal. {extra}",
+        "{detail} Produto revisado por técnico especializado. Sem arranhões ou defeitos. {extra}",
+        "Oportunidade única para adquirir este item de alta tecnologia. {condition_long}. {detail} {extra}"
+      ],
+      "conditions": [
+        "perfeito estado",
+        "ótimo estado de conservação",
+        "estado impecável, sem marcas"
+      ],
+      "conditions_long": [
+        "Utilizado por apenas 3 meses, motivo da venda é a atualização para modelo superior",
+        "Adquirido recentemente e pouco utilizado, conserva todas as características de novo",
+        "Item de exposição, nunca saiu da caixa, aproveitamento do estoque"
+      ],
+      "details": [
+        "Bateria com 95% de ciclo de vida.",
+        "Acompanha carregador original e capinha protetora.",
+        "Tela sem nenhum arranhão, vidro original intacto.",
+        "Processador de última geração com desempenho excepcional."
+      ],
+      "extras": [
+        "Garantia de fábrica ainda vigente.",
+        "Pode ser retirado pessoalmente ou enviado com seguro.",
+        "Nota fiscal disponível para o comprador.",
+        "Aceito visita para inspeção antes do arremate."
+      ]
+    },
+    "VEHICLES": {
+      "items": [
+        [
+          "Motocicleta Honda CB 500F 2021 Vermelha",
+          18000,
+          35000
+        ],
+        [
+          "Volkswagen Golf GTI 2019 Automático",
+          90000,
+          160000
+        ],
+        [
+          "Bicicleta Elétrica Caloi E-Vibe City",
+          4000,
+          9000
+        ],
+        [
+          "Jet Ski Yamaha VX Cruiser HO 2020",
+          50000,
+          110000
+        ],
+        [
+          "Caminhonete Ford Ranger XLS 2018 Diesel 4x4",
+          130000,
+          220000
+        ],
+        [
+          "Quadriciclo Polaris Sportsman 570 2022",
+          45000,
+          90000
+        ],
+        [
+          "Trailer Carretinha 3 Eixos 12 Toneladas",
+          25000,
+          60000
+        ],
+        [
+          "Scooter Elétrica Xiaomi Pro 2 Dobrável",
+          2500,
+          6000
+        ],
+        [
+          "Barco Lancha Focker 235 Motor Volvo",
+          90000,
+          200000
+        ],
+        [
+          "Toyota Corolla Cross 2022 Híbrido",
+          120000,
+          190000
+        ]
+      ],
+      "desc_templates": [
+        "{detail} Documentação em dia, IPVA {ipva_status}. {condition_long}. {extra}",
+        "Veículo em {condition}. {detail} Transferência a cargo do comprador. {extra}",
+        "Excelente oportunidade de arremate. {condition_long}. {detail} {extra}"
+      ],
+      "conditions": [
+        "estado de zero km",
+        "ótimas condições de uso",
+        "excelente estado de conservação"
+      ],
+      "conditions_long": [
+        "Único dono, todos os serviços realizados em concessionária autorizada",
+        "Veículo de frota empresarial com manutenção em dia e histórico completo",
+        "Proprietário migrando para veículo elétrico, motivo da venda"
+      ],
+      "details": [
+        "Motor revisado recentemente com laudo em mãos.",
+        "Pneus novos trocados há menos de 5.000 km.",
+        "Lataria original sem amassados, pintura impecável.",
+        "Ar-condicionado, direção elétrica e todos os opcionais funcionando."
+      ],
+      "extras": [
+        "IPVA 2025 pago.",
+        "Licenciamento 2025 em dia.",
+        "Aceito teste drive mediante agendamento.",
+        "Financiamento facilitado para o arrematante."
+      ],
+      "ipva_status": [
+        "pago",
+        "2025 quitado",
+        "em dia"
+      ]
+    },
+    "FASHION": {
+      "items": [
+        [
+          "Bolsa Louis Vuitton Speedy 30 Monogram Original",
+          6000,
+          18000
+        ],
+        [
+          "Tênis Nike Air Jordan 1 Retro High OG",
+          800,
+          3500
+        ],
+        [
+          "Relógio Masculino Rolex Datejust 41 Automático",
+          40000,
+          120000
+        ],
+        [
+          "Jaqueta Gucci de Couro Legítimo Tamanho M",
+          5000,
+          15000
+        ],
+        [
+          "Óculos Ray-Ban Aviador Clássico Ouro",
+          400,
+          1200
+        ],
+        [
+          "Vestido Hermès Seda Estampado 36",
+          3000,
+          9000
+        ],
+        [
+          "Cinto Ferragamo Reversível Preto/Marrom",
+          900,
+          2800
+        ],
+        [
+          "Mochila Prada Nylon Preto Original",
+          4500,
+          12000
+        ],
+        [
+          "Cashmere Brunello Cucinelli Masculino Cinza",
+          5000,
+          14000
+        ],
+        [
+          "Scarpin Christian Louboutin Nude 38",
+          2500,
+          7000
+        ]
+      ],
+      "desc_templates": [
+        "Peça {condition}. {detail} Acompanha caixa original, cartão de autenticidade e sacola da marca. {extra}",
+        "{detail} Item verificado e autenticado. {condition_long}. {extra}",
+        "Raridade no mercado nacional. {condition_long}. {detail} {extra}"
+      ],
+      "conditions": [
+        "em perfeito estado",
+        "conservadíssima, raramente usada",
+        "seminova sem defeitos"
+      ],
+      "conditions_long": [
+        "Adquirida em viagem internacional, usada apenas uma vez em evento especial",
+        "Peça de coleção particular, guardada em local adequado e protegida",
+        "Presente recebido, mas o estilo não combina com o perfil do proprietário"
+      ],
+      "details": [
+        "Sem manchas, desgaste ou rasgos.",
+        "Hardware dourado em perfeito estado sem oxidação.",
+        "Costura original intacta, sem remendos.",
+        "Numeração e serial conferem com documentação da marca."
+      ],
+      "extras": [
+        "Aceito proposta via mensagem antes do leilão encerrar.",
+        "Certificado de autenticidade incluso.",
+        "Fotos adicionais disponíveis mediante solicitação.",
+        "Envio em embalagem especial com seguro."
+      ]
+    },
+    "COLLECTIBLES_AND_ART": {
+      "items": [
+        [
+          "Figura Funko Pop Edição Limitada #001 Grail",
+          500,
+          5000
+        ],
+        [
+          "Quadro Original Óleo sobre Tela Assinado",
+          3000,
+          30000
+        ],
+        [
+          "Coleção Completa Cards Pokémon 1ª Edição Base Set",
+          5000,
+          50000
+        ],
+        [
+          "Estátua Bronze Século XIX Arte Europeia",
+          8000,
+          40000
+        ],
+        [
+          "Cópia Numerada Litografia Portinari",
+          2000,
+          15000
+        ],
+        [
+          "Boneco Star Wars Vintage Kenner 1977 Lacrado",
+          1500,
+          12000
+        ],
+        [
+          "Conjunto de Moedas Antigas Brasileiras Império",
+          1000,
+          8000
+        ],
+        [
+          "Relógio de Bolso Patek Philippe Ouro Século XX",
+          15000,
+          80000
+        ],
+        [
+          "Máquina de Escrever Olympia SM9 Restaurada",
+          800,
+          3000
+        ],
+        [
+          "Coleção Completa Mangá Berserk Primeira Edição",
+          2000,
+          10000
+        ]
+      ],
+      "desc_templates": [
+        "Item raro de colecionador. {detail} {condition_long}. {extra}",
+        "{condition_long}. {detail} Oportunidade única para colecionadores exigentes. {extra}",
+        "Peça com alto potencial de valorização. {detail} {condition_long}. {extra}"
+      ],
+      "conditions": [
+        "estado impecável",
+        "excelente estado dado o período histórico",
+        "bem preservado"
+      ],
+      "conditions_long": [
+        "Mantido em coleção particular por décadas, com proveniência documentada",
+        "Proveniente de acervo familiar com mais de 50 anos de história",
+        "Adquirido em leilão internacional conceituado com certificação inclusa"
+      ],
+      "details": [
+        "Peça acompanha certificado de autenticidade emitido por especialista.",
+        "Documentação completa da proveniência disponível para o arrematante.",
+        "Avaliado por perito reconhecido no mercado de arte brasileiro.",
+        "Sem restaurações ou intervenções, estado original preservado."
+      ],
+      "extras": [
+        "Pode ser avaliado por especialista do comprador antes do arremate.",
+        "Transporte especializado e seguro incluso no valor.",
+        "Laudo de conservação disponível mediante solicitação.",
+        "Embalagem museológica para transporte com segurança máxima."
+      ]
+    },
+    "SPORTS": {
+      "items": [
+        [
+          "Bicicleta Speed Trek Madone SLR 9 Carbono",
+          20000,
+          55000
+        ],
+        [
+          "Estação de Musculação Multifunction Pro",
+          2500,
+          8000
+        ],
+        [
+          "Raquete de Tênis Wilson Pro Staff RF97 Autografada",
+          800,
+          5000
+        ],
+        [
+          "Prancha de Surf Lost Round Nose Fish 5'10\"",
+          1500,
+          4000
+        ],
+        [
+          "Kit Mergulho Mares Completo com Cilindro",
+          3000,
+          9000
+        ],
+        [
+          "Caiaque Oceano Profissional 5.5m",
+          4000,
+          12000
+        ],
+        [
+          "Treadmill NordicTrack Commercial 2450",
+          5000,
+          14000
+        ],
+        [
+          "Esqui Rossignol Experience 88 Ti com Botas",
+          2500,
+          7000
+        ],
+        [
+          "Moto de Trilha KTM EXC-F 350 2022",
+          35000,
+          65000
+        ],
+        [
+          "Arco Composto Hoyt Carbon RX-7 com Acessórios",
+          5000,
+          15000
+        ]
+      ],
+      "desc_templates": [
+        "Equipamento esportivo em {condition}. {detail} Ideal para atletas amadores e profissionais. {extra}",
+        "{detail} {condition_long}. Perfeito para quem busca qualidade e desempenho. {extra}",
+        "Oportunidade para esportistas. {condition_long}. {detail} {extra}"
+      ],
+      "conditions": [
+        "excelente estado",
+        "ótimas condições de uso",
+        "estado de novo"
+      ],
+      "conditions_long": [
+        "Utilizado por apenas uma temporada, armazenado adequadamente fora de uso",
+        "Proprietário abandonou a prática do esporte, item praticamente novo",
+        "Equipamento de demonstração de loja, nunca usado em competição"
+      ],
+      "details": [
+        "Sem desgaste estrutural, apenas marcas normais de uso.",
+        "Revisado e lubrificado, pronto para uso imediato.",
+        "Tamanho e especificações descritos em detalhes no anúncio.",
+        "Todos os acessórios originais acompanham o lote."
+      ],
+      "extras": [
+        "Retirada prioritária ou envio via transportadora especializada.",
+        "Manual do fabricante e garantia residual inclusa.",
+        "Possível troca por outro equipamento esportivo de valor similar.",
+        "Fotos de uso disponíveis para comprovar estado."
+      ]
+    },
+    "HEALTH_AND_BEAUTY": {
+      "items": [
+        [
+          "Cadeira de Massagem Shiatsu Reclinável Full Body",
+          3000,
+          10000
+        ],
+        [
+          "Kit Profissional Maquiagem MAC 48 itens",
+          800,
+          3500
+        ],
+        [
+          "Aparelho CPAP Philips DreamStation com Umidificador",
+          2500,
+          7000
+        ],
+        [
+          "Perfume Chanel N°5 Edição Limitada 200ml",
+          500,
+          2500
+        ],
+        [
+          "Balança de Bioimpedância Omron HBF-720",
+          600,
+          2000
+        ],
+        [
+          "Epilador a Laser Ulike Air 3 IPL",
+          1000,
+          3500
+        ],
+        [
+          "Maca de Massagem Estética Elétrica",
+          1500,
+          5000
+        ],
+        [
+          "Purificador de Ar Dyson TP09 com Wi-Fi",
+          3500,
+          9000
+        ],
+        [
+          "Kit Dental Sorriso Perfeito Clínica",
+          1200,
+          4000
+        ],
+        [
+          "Óculos de Fototerapia LED Antienvelhecimento",
+          800,
+          3000
+        ]
+      ],
+      "desc_templates": [
+        "Produto em {condition}. {detail} Ideal para uso doméstico ou profissional. {extra}",
+        "{condition_long}. {detail} Qualidade premium com resultado comprovado. {extra}",
+        "{detail} {condition_long}. Excelente para bem-estar e saúde. {extra}"
+      ],
+      "conditions": [
+        "ótimo estado",
+        "perfeito estado de funcionamento",
+        "estado impecável"
+      ],
+      "conditions_long": [
+        "Comprado para uso em clínica que encerrou as atividades, pouco utilizado",
+        "Presente que não se adequou às necessidades do destinatário, praticamente novo",
+        "Utilizado por apenas 2 meses, decisão de mudar de rotina de saúde"
+      ],
+      "details": [
+        "Higienizado e sanitizado antes da venda.",
+        "Manual em português e garantia do fabricante inclusa.",
+        "Testado e funcionando 100%, sem defeitos.",
+        "Todos os acessórios e cabos originais acompanham o produto."
+      ],
+      "extras": [
+        "Embalagem original preservada para transporte seguro.",
+        "Nota fiscal disponível para garantia.",
+        "Entrega disponível para capital e interior mediante frete.",
+        "Demonstração de funcionamento possível antes do arremate."
+      ]
+    },
+    "BOOKS": {
+      "items": [
+        [
+          "Coleção Harry Potter Edição Especial 20 Anos 7 Volumes",
+          600,
+          2500
+        ],
+        [
+          "Box Dom Casmurro + Obra Completa Machado de Assis 15 Vol.",
+          300,
+          1200
+        ],
+        [
+          "Livro de Arte Taschen Salvador Dalí Edição XL",
+          800,
+          3000
+        ],
+        [
+          "Primeira Edição Grande Sertão: Veredas 1956 João Guimarães Rosa",
+          2000,
+          15000
+        ],
+        [
+          "Coleção Enciclopédia Barsa Completa 20 Volumes",
+          200,
+          800
+        ],
+        [
+          "Box Senhor dos Anéis Edição Luxo Ilustrado Tolkien",
+          400,
+          1800
+        ],
+        [
+          "Coleção Mangá One Piece Completa 1-105 Nacional",
+          1200,
+          4000
+        ],
+        [
+          "Livro Técnico Arquitetura Moderna Le Corbusier Edição Rara",
+          500,
+          2500
+        ],
+        [
+          "Box Agatha Christie Edição Colecionador 30 Volumes",
+          700,
+          2800
+        ],
+        [
+          "Revista National Geographic Coleção Completa 1990-2010",
+          400,
+          2000
+        ]
+      ],
+      "desc_templates": [
+        "Exemplar(es) em {condition}. {detail} Raridade literária para colecionadores. {extra}",
+        "{condition_long}. {detail} Adição valiosa para qualquer biblioteca pessoal. {extra}",
+        "{detail} {condition_long}. Oportunidade de ouro para apreciadores da literatura. {extra}"
+      ],
+      "conditions": [
+        "excelente estado de conservação",
+        "ótimo estado, sem marcas ou anotações",
+        "estado de novo, sem aberturas nas lombadas"
+      ],
+      "conditions_long": [
+        "Pertenceu a biblioteca particular e nunca foi emprestado ou manuseado por terceiros",
+        "Coleção adquirida em liquidação de editora, itens lacrados em sua maioria",
+        "Herança de familiar bibliófilo, conservados em local seco e longe da luz"
+      ],
+      "details": [
+        "Sem rasuras, grifos ou folhas rasgadas.",
+        "Capas e lombadas íntegras, sem amassados.",
+        "Páginas sem manchas, amarelamento mínimo esperado para o período.",
+        "Box original acompanha o conjunto completo."
+      ],
+      "extras": [
+        "Envio via Correios com embalagem reforçada.",
+        "Exemplar autografado pelo autor (verificar descrição).",
+        "Certificado de autenticidade para primeiras edições incluso.",
+        "Desconto para retirada presencial em São Paulo."
+      ]
+    },
+    "MOVIE": {
+      "items": [
+        [
+          "Coleção Blu-Ray Star Wars Saga Completa 9 Filmes 4K",
+          400,
+          1500
+        ],
+        [
+          "Projetor Cinema 4K Epson EH-TW9400 HDR",
+          10000,
+          28000
+        ],
+        [
+          "Tela de Projeção Elétrica 120\" 16:9 Motorizada",
+          1500,
+          5000
+        ],
+        [
+          "Coleção DVD Raridade Edição Limitada Stanley Kubrick",
+          300,
+          1200
+        ],
+        [
+          "Sistema Home Theater Sonos Arc + Sub + Era 300",
+          8000,
+          22000
+        ],
+        [
+          "Câmera de Cinema Black Magic Pocket 6K Pro",
+          8000,
+          20000
+        ],
+        [
+          "Pôster Original Lançamento Star Wars 1977 EUA",
+          2000,
+          15000
+        ],
+        [
+          "Claquete Autografada Elenco Matrix Reloaded",
+          500,
+          3000
+        ],
+        [
+          "Poltrona Reclinável Home Theater Couro Legítimo",
+          2000,
+          7000
+        ],
+        [
+          "Coleção LaserDisc Completa Clássicos Hollywood 50 Títulos",
+          400,
+          2000
+        ]
+      ],
+      "desc_templates": [
+        "Para os cinéfilos exigentes: {detail} {condition_long}. {extra}",
+        "Item em {condition}. {detail} Perfeito para completar sua coleção ou sala de cinema. {extra}",
+        "{condition_long}. {detail} Uma verdadeira joia para os amantes do cinema. {extra}"
+      ],
+      "conditions": [
+        "excelente estado",
+        "perfeito estado, sem arranhões nas mídias",
+        "conservadíssimo"
+      ],
+      "conditions_long": [
+        "Pertenceu a colecionador que está desfazendo o acervo após décadas reunindo",
+        "Item adquirido em leilão nos EUA e importado com nota fiscal",
+        "Presente recebido de familiar que trabalhou na indústria cinematográfica"
+      ],
+      "details": [
+        "Mídias sem arranhões, capas originais preservadas.",
+        "Equipamento testado e funcionando perfeitamente.",
+        "Acompanha controle remoto e manual originais.",
+        "Certificado de autenticidade ou proveniência incluso."
+      ],
+      "extras": [
+        "Frete grátis para capitais com seguro incluso.",
+        "Possível visita para teste antes do arremate.",
+        "Embalagem especial para preservar o item no transporte.",
+        "Aceito troca por outros itens de coleção de igual valor."
+      ]
+    },
+    "INDUSTRIAL": {
+      "items": [
+        [
+          "Torno Mecânico Romi GL-240 CNC Revisado",
+          25000,
+          80000
+        ],
+        [
+          "Compressor de Ar Schulz 10HP Trifásico 200L",
+          5000,
+          15000
+        ],
+        [
+          "Serra Fita Industrial Trifásica 1.5HP 220V",
+          3000,
+          9000
+        ],
+        [
+          "Empilhadeira Elétrica Toyota 3 Toneladas",
+          30000,
+          75000
+        ],
+        [
+          "Gerador a Diesel Stemac 100kVA Silenciado",
+          40000,
+          100000
+        ],
+        [
+          "Soldadora TIG MIG Inversora Miller 300A",
+          4000,
+          12000
+        ],
+        [
+          "Máquina de Corte a Laser Fiber 1500W 1530",
+          50000,
+          150000
+        ],
+        [
+          "Balança Industrial Plataforma 2000kg",
+          3000,
+          10000
+        ],
+        [
+          "Estufa Industrial de Secagem Elétrica 200°C",
+          5000,
+          18000
+        ],
+        [
+          "Fresadora CNC 3 Eixos Mesa 1000x600mm",
+          35000,
+          120000
+        ]
+      ],
+      "desc_templates": [
+        "Equipamento industrial em {condition}. {detail} Pronto para operação imediata. {extra}",
+        "{condition_long}. {detail} Excelente oportunidade para indústria ou oficina. {extra}",
+        "Máquina com baixo horimetro. {detail} {condition_long}. {extra}"
+      ],
+      "conditions": [
+        "ótimo estado operacional",
+        "excelente estado, revisado recentemente",
+        "bom estado de funcionamento"
+      ],
+      "conditions_long": [
+        "Proveniente de empresa que encerrou atividade, equipamento subutilizado",
+        "Substituído por modelo mais moderno, mantido em manutenção preventiva em dia",
+        "Equipamento de backup que nunca foi operado em carga total"
+      ],
+      "details": [
+        "Horímetro indica baixo tempo de uso comprovado.",
+        "Manutenção preventiva em dia com histórico completo.",
+        "Acompanha manual técnico e ferramental específico.",
+        "Revisado por técnico especializado com laudo incluso."
+      ],
+      "extras": [
+        "Desmontagem e transporte por conta do arrematante.",
+        "Visita técnica para inspeção agendada com antecedência.",
+        "Treinamento de operação incluído para o comprador.",
+        "Nota fiscal de compra original disponível."
+      ]
+    },
+    "JEWELRY": {
+      "items": [
+        [
+          "Anel Solitário Diamante 1.2ct Ouro 18k Certificado GIA",
+          15000,
+          60000
+        ],
+        [
+          "Colar Perolas Naturais Cultivadas 8mm 50cm",
+          3000,
+          12000
+        ],
+        [
+          "Bracelete Cartier Love Ouro Rosa 18k Original",
+          18000,
+          45000
+        ],
+        [
+          "Brinco Argola Tiffany & Co Prata 925 Original",
+          800,
+          3000
+        ],
+        [
+          "Relógio Omega Seamaster Diver 300M Automático",
+          12000,
+          35000
+        ],
+        [
+          "Anel Esmeralda Colombiana Ouro 18k com Brilhantes",
+          8000,
+          30000
+        ],
+        [
+          "Pingente Safira Sri Lanka 3ct Ouro Branco",
+          5000,
+          20000
+        ],
+        [
+          "Conjunto Parure Vintage Art Déco Anos 1930",
+          3000,
+          15000
+        ],
+        [
+          "Pulseira Pandora Prata 925 com 20 Berloque Originais",
+          600,
+          2500
+        ],
+        [
+          "Alianças Casamento Ouro 18k Par 6g Cada",
+          2500,
+          8000
+        ]
+      ],
+      "desc_templates": [
+        "Joia em {condition}. {detail} Acompanha certificação e estojo original. {extra}",
+        "{condition_long}. {detail} Peça rara com alto valor de mercado comprovado. {extra}",
+        "Para os amantes de joalheria fina. {detail} {condition_long}. {extra}"
+      ],
+      "conditions": [
+        "perfeito estado",
+        "excelente conservação sem arranhados ou desgastes",
+        "estado impecável"
+      ],
+      "conditions_long": [
+        "Pertenceu a acervo familiar com peças adquiridas ao longo de décadas",
+        "Joia de uso raro em cerimônias, guardada em cofre e embalagem original",
+        "Adquirida em joalheria conceituada, acompanha nota fiscal e certificado"
+      ],
+      "details": [
+        "Laudo gemológico e certificação internacional acompanham o lote.",
+        "Pedra central com cor, corte e pureza documentados.",
+        "Metal precioso com marcação e pureza verificada por ourives.",
+        "Acompanha estojo original da marca e caixa de presente."
+      ],
+      "extras": [
+        "Transporte em maleta segura com rastreamento.",
+        "Avaliação por joalheiro de confiança do comprador permitida.",
+        "Seguro de transporte incluso no valor do lance.",
+        "Limpeza profissional e polimento realizados antes da entrega."
+      ]
+    },
+    "PETS": {
+      "items": [
+        [
+          "Gaiola Voliére Jardim 2x2x2m para Aves Exóticas",
+          2000,
+          7000
+        ],
+        [
+          "Aquário Marinho Completo 500L com Refugo",
+          5000,
+          18000
+        ],
+        [
+          "Casa para Cão Gigante Madeira Tratada 120x90cm",
+          800,
+          3000
+        ],
+        [
+          "Kit Completo Terrário Répteis UV 120x60x60cm",
+          1500,
+          5000
+        ],
+        [
+          "Arranhador Cat Tree para Gatos 180cm Premium",
+          600,
+          2200
+        ],
+        [
+          "Andador Elétrico Esteira Pet até 30kg",
+          1000,
+          3500
+        ],
+        [
+          "Banheira Hidromassagem PET Inox Profissional",
+          3000,
+          9000
+        ],
+        [
+          "Kit Exposição Canina Completo Mesa + Secador",
+          2000,
+          7000
+        ],
+        [
+          "Ração Premium Royal Canin Caixas 15kg x10 Unidades",
+          800,
+          2500
+        ],
+        [
+          "Bebedouro Automático Purificado Animais de Grande Porte",
+          400,
+          1500
+        ]
+      ],
+      "desc_templates": [
+        "Item para pets em {condition}. {detail} Ideal para tutores que buscam o melhor para seus animais. {extra}",
+        "{condition_long}. {detail} Qualidade profissional disponível para uso doméstico. {extra}",
+        "{detail} {condition_long}. Excelente para bem-estar e conforto dos pets. {extra}"
+      ],
+      "conditions": [
+        "ótimo estado",
+        "excelente estado, higienizado",
+        "perfeito estado de uso"
+      ],
+      "conditions_long": [
+        "Pertencia a pet shop que encerrou atividades, usado por período curto",
+        "Comprado para animal que faleceu, praticamente sem uso",
+        "Substituído por modelo maior após adoção de animal de maior porte"
+      ],
+      "details": [
+        "Higienizado e sanitizado adequadamente antes da venda.",
+        "Todos os acessórios e componentes originais incluídos.",
+        "Estrutura resistente e segura para o bem-estar animal.",
+        "Manual e garantia do fabricante acompanham o produto."
+      ],
+      "extras": [
+        "Montagem e instalação por conta do comprador.",
+        "Envio em partes desmontado para facilitar o transporte.",
+        "Fotos do uso real disponíveis para avaliação.",
+        "Aceito troca por outros itens de valor similar."
+      ]
+    },
+    "TOYS": {
+      "items": [
+        [
+          "LEGO Technic Bugatti Chiron 3599 Peças Lacrado",
+          1500,
+          5000
+        ],
+        [
+          "Boneca Barbie Holiday Edição Especial 2023 Lacrada",
+          400,
+          1800
+        ],
+        [
+          "Pista Hot Wheels Ultimate Garage 4 Andares",
+          600,
+          2200
+        ],
+        [
+          "Playmobil Castelo Medieval 6000 Peças Completo",
+          800,
+          3000
+        ],
+        [
+          "Nintendo Switch OLED + 10 Jogos Físicos",
+          2500,
+          6000
+        ],
+        [
+          "Robô Educacional Programmable LEGO Mindstorms",
+          1200,
+          4500
+        ],
+        [
+          "Figura Colecionável Bandai S.H.Figuarts Goku Ultra",
+          500,
+          2000
+        ],
+        [
+          "Trem Märklin Escala HO Coleção Completa Digital",
+          2000,
+          8000
+        ],
+        [
+          "Boneco Action Figure He-Man Vintage Kenner Anos 80",
+          300,
+          1500
+        ],
+        [
+          "Baralho Magic The Gathering Coleção Rara Power 9",
+          5000,
+          30000
+        ]
+      ],
+      "desc_templates": [
+        "Brinquedo em {condition}. {detail} Ótimo presente ou item de coleção. {extra}",
+        "{condition_long}. {detail} Diversão garantida ou valorização certa para colecionadores. {extra}",
+        "{detail} {condition_long}. Uma raridade no mercado brasileiro. {extra}"
+      ],
+      "conditions": [
+        "perfeito estado",
+        "ótimo estado, completo com todas as peças",
+        "excelente conservação"
+      ],
+      "conditions_long": [
+        "Pertenceu a criança que cresceu, guardado com muito cuidado pelos pais",
+        "Item de coleção nunca retirado da caixa original, lacrado de fábrica",
+        "Comprado em promoção e guardado como investimento, nunca aberto"
+      ],
+      "details": [
+        "Todas as peças originais presentes, sem reposições.",
+        "Caixa original com arte e manual incluídos.",
+        "Sem peças faltando, testado e completo.",
+        "Embalagem com mínimo desgaste, produto interno impecável."
+      ],
+      "extras": [
+        "Embalagem reforçada para transporte sem danos.",
+        "Fotos de cada peça disponíveis mediante solicitação.",
+        "Aceito verificação presencial antes do arremate.",
+        "Envio rápido via transportadora especializada em frágeis."
+      ]
+    },
+    "HOME_AND_GARDEN": {
+      "items": [
+        [
+          "Sofá Chesterfield 3 Lugares Couro Legítimo Castanho",
+          4000,
+          14000
+        ],
+        [
+          "Mesa de Jantar Madeira Maciça Peroba 2m + 8 Cadeiras",
+          6000,
+          20000
+        ],
+        [
+          "Churrasqueira a Gás Embutir Tramontina Master",
+          2500,
+          8000
+        ],
+        [
+          "Piscina Fibra Oval 6x3m com Bomba e Filtro",
+          8000,
+          25000
+        ],
+        [
+          "Lustre de Cristal Importado 120cm 48 Braços",
+          3000,
+          12000
+        ],
+        [
+          "Conjunto Jardim Vime Sintético 1 Sofá + 2 Poltronas",
+          2000,
+          7000
+        ],
+        [
+          "Forno a Lenha Revestimento Pedra Sabão 80cm",
+          2000,
+          8000
+        ],
+        [
+          "Adega Climatizada Electrolux 76 Garrafas WiFi",
+          2500,
+          7000
+        ],
+        [
+          "Cozinha Planejada Completa MDF 10 Módulos + Granito",
+          10000,
+          35000
+        ],
+        [
+          "Robot Cortador de Grama Husqvarna Automower 450X",
+          8000,
+          20000
+        ]
+      ],
+      "desc_templates": [
+        "Item para casa em {condition}. {detail} Adicione elegância e funcionalidade ao seu lar. {extra}",
+        "{condition_long}. {detail} Qualidade e durabilidade comprovadas. {extra}",
+        "{detail} {condition_long}. Valorize seu imóvel com esta aquisição. {extra}"
+      ],
+      "conditions": [
+        "excelente estado",
+        "ótimo estado de conservação",
+        "perfeito estado"
+      ],
+      "conditions_long": [
+        "Pertencia a residência de alto padrão que foi vendida e reformada",
+        "Comprado para imóvel que não chegou a ser ocupado, praticamente novo",
+        "Proprietário reformando a casa e substituindo móveis, item em perfeitas condições"
+      ],
+      "details": [
+        "Sem riscos, manchas ou desgastes visíveis.",
+        "Limpeza profissional realizada antes da venda.",
+        "Medidas e especificações detalhadas nas fotos do lote.",
+        "Material de alta qualidade com durabilidade comprovada."
+      ],
+      "extras": [
+        "Desmontagem e transporte por conta do arrematante.",
+        "Possível montagem e instalação mediante contratação à parte.",
+        "Nota fiscal original disponível para o comprador.",
+        "Retirada somente com agendamento prévio."
+      ]
+    },
+    "MUSIC": {
+      "items": [
+        [
+          "Piano Yamaha U3 Acústico Vertical Seminovo",
+          15000,
+          40000
+        ],
+        [
+          "Guitarra Gibson Les Paul Standard 59 Reissue",
+          12000,
+          35000
+        ],
+        [
+          "Violino Stentor Student II 4/4 com Arco e Case",
+          800,
+          3000
+        ],
+        [
+          "Bateria Acústica Pearl Export EXX 5 Corpos",
+          4000,
+          12000
+        ],
+        [
+          "Saxofone Alto Yamaha YAS-280 Dourado",
+          3000,
+          9000
+        ],
+        [
+          "Amplificador Marshall DSL40CR Valvulado 40W",
+          3500,
+          10000
+        ],
+        [
+          "Acordeão Scandalli 120 Baixos 4 Vozes Novo",
+          5000,
+          18000
+        ],
+        [
+          "Mesa de Som Digital Behringer X32 Full Size",
+          8000,
+          22000
+        ],
+        [
+          "Contrabaixo Fender American Professional II Jazz",
+          7000,
+          20000
+        ],
+        [
+          "Sintetizador Moog One 16 Vozes Polifônico",
+          35000,
+          90000
+        ]
+      ],
+      "desc_templates": [
+        "Instrumento em {condition}. {detail} Perfeito para músicos de todos os níveis. {extra}",
+        "{condition_long}. {detail} Som e toque excepcionais para exigentes. {extra}",
+        "{detail} {condition_long}. Uma verdadeira raridade para músicos. {extra}"
+      ],
+      "conditions": [
+        "excelente estado de conservação",
+        "ótimo estado, recentemente regulado",
+        "perfeito estado de toque e som"
+      ],
+      "conditions_long": [
+        "Instrumento de músico profissional que está atualizando o equipamento",
+        "Usado em gravações de estúdio, muito bem conservado e regulado",
+        "Pertenceu a escola de música que fechou, pouco utilizado"
+      ],
+      "details": [
+        "Afinação e regulagem recente por luthier especializado.",
+        "Sem trincas, arranhões profundos ou intervenções indevidas.",
+        "Case/bag original acompanha o instrumento.",
+        "Hardcase profissional incluso para transporte seguro."
+      ],
+      "extras": [
+        "Possível demonstração para o comprador antes do arremate.",
+        "Envio somente com seguro e embalagem especial.",
+        "Aceito proposta de troca por instrumento de valor similar.",
+        "Certificado de regulagem e conservação disponível."
+      ]
+    },
+    "OTHER": {
+      "items": [
+        [
+          "Máquina de Café Espresso La Marzocco Linea Mini",
+          8000,
+          20000
+        ],
+        [
+          "Baú Antigo Madeira Maciça com Ferragens Originais",
+          500,
+          3000
+        ],
+        [
+          "Kit Ferramentas Profissionais Stanley 200 peças",
+          800,
+          3000
+        ],
+        [
+          "Telescópio Celestron NexStar 8SE Computadorizado",
+          5000,
+          14000
+        ],
+        [
+          "Mini Adega de Chão Elétrica Barrels & More 80L",
+          2000,
+          6000
+        ],
+        [
+          "Frigobar Retro Smeg Vermelho FAB5RRD5",
+          2500,
+          7000
+        ],
+        [
+          "Cadeira Gamer DXRacer Formula Series Preta",
+          800,
+          2800
+        ],
+        [
+          "Impressora de Etiquetas Zebra ZD421 Térmica",
+          1500,
+          5000
+        ],
+        [
+          "Máquina de Costura Industrial Overlock 5 Fios",
+          2000,
+          7000
+        ],
+        [
+          "Escultura Decorativa Bronze Fundido 60cm",
+          1000,
+          6000
+        ]
+      ],
+      "desc_templates": [
+        "Item em {condition}. {detail} Uma ótima adição ao seu dia a dia ou coleção. {extra}",
+        "{condition_long}. {detail} Qualidade e praticidade garantidas. {extra}",
+        "{detail} {condition_long}. Não perca esta oportunidade única. {extra}"
+      ],
+      "conditions": [
+        "ótimo estado",
+        "excelente estado de conservação",
+        "perfeito estado"
+      ],
+      "conditions_long": [
+        "Adquirido recentemente e pouco utilizado, proprietário mudando de interesse",
+        "Pertencia a estabelecimento comercial que encerrou atividades",
+        "Item de demonstração, avaliado e em perfeito funcionamento"
+      ],
+      "details": [
+        "Testado e aprovado, funcionando sem qualquer defeito.",
+        "Acompanha todos os acessórios e manual original.",
+        "Embalagem original disponível para transporte seguro.",
+        "Produto higienizado e pronto para uso imediato."
+      ],
+      "extras": [
+        "Envio para todo o Brasil mediante frete a combinar.",
+        "Retirada presencial disponível com agendamento.",
+        "Aceito visita prévia para inspeção do item.",
+        "Pagamento parcelado possível para arrematantes cadastrados."
+      ]
+    }
+  }
+}

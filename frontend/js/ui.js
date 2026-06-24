@@ -73,7 +73,7 @@
     el.innerHTML = '' +
       '<div class="cabecalho">' +
         '<div style="float:right;font-size:11px;color:#fff;margin-top:6px">' + saudacao + '</div>' +
-        '<h1><span class="logo-martelo">🔨</span> O Leiloeiro Online</h1>' +
+        '<h1><span class="logo-martelo">🔨</span> Oleiloeiro Online</h1>' +
         '<div class="slogan">~ O maior portal de leilões da internet brasileira desde 2001 ~</div>' +
       '</div>' +
       '<marquee class="faixa-rolante" scrollamount="5">' +
@@ -104,7 +104,7 @@
         '🚧 ' +
         'Você é o visitante número <span class="contador-visitas">' + visitas + '</span> 🚧<br>' +
         '© 2001-2026 Oleiloeiro Online — Melhor visualizado em 800x600 com Internet Explorer 6.0<br>' +
-        '<a href="#">Quem Somos</a> | <a href="#">Fale Conosco</a> | <a href="#">Política de Privacidade</a> | ' +
+        '<a href="quem-somos.html">Quem Somos</a> | <a href="#">Fale Conosco</a> | <a href="#">Política de Privacidade</a> | ' +
         '<a href="#">Ajuda</a> | <a href="#topo">Voltar ao topo ↑</a>' +
       '</div>';
   }
