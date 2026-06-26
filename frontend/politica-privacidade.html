@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=980">
+  <title>Política de Privacidade - O Leiloeiro Online</title>
+  <link rel="stylesheet" href="css/estilo.css">
+  <style>
+    .paginacao a {
+      text-decoration: none;
+      color: #0000ee;
+      padding: 2px 5px;
+      border: 1px solid #ccc;
+      background-color: #f9f9f9;
+      margin: 0 2px;
+    }
+    .paginacao a:hover {
+      background-color: #e0e0e0;
+    }
+    .paginacao b {
+      padding: 2px 5px;
+      margin: 0 2px;
+      background-color: #ffff80;
+      border: 1px solid #999;
+      color: #000;
+    }
+    .texto-legal {
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 14px;
+      line-height: 1.4;
+      background: #fff;
+      border: 2px inset #eee;
+      padding: 15px;
+      white-space: pre-wrap;
+      text-align: left;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+  <div class="pagina">
+    <div id="topo"></div>
+
+    <table class="layout">
+      <tbody>
+        <tr>
+          <td class="coluna-lateral">
+            <div class="caixa">
+              <div class="titulo">Aviso Legal</div>
+              <div class="corpo dica" style="text-align: justify">
+                Nossa Política de Privacidade é levada muito a sério. Leia atentamente todos os termos (e não estranhe se encontrar ogros pelo caminho).
+              </div>
+            </div>
+          </td>
+          <td class="conteudo">
+            <div class="caixa">
+              <div class="titulo">🔒 Política de Privacidade (Termos de Uso)</div>
+              <div class="corpo" style="padding: 20px;">
+                <div id="texto-politica" class="texto-legal">Carregando os termos de privacidade...</div>
+                <div class="paginacao" id="controles-paginacao" style="text-align: center; margin-top: 20px;"></div>
+              </div>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div id="rodape"></div>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/politica.js"></script>
+  <script>
+    UI.iniciarPagina('politica-privacidade.html');
+  </script>
+</body>
+</html>

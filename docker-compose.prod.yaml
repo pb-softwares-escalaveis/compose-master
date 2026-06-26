@@ -29,6 +29,11 @@ services:
   # EUREKA SERVER
   # ============================================================
   eureka-server:
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: '512M'
     container_name: eureka-server
     image: steeltoeoss/eureka-server:latest
     ports:
@@ -47,6 +52,11 @@ services:
   # KAFKA
   # ============================================================
   kafka:
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: '1G'
     image: apache/kafka:4.3.0
     container_name: leilao-kafka
     ports:
@@ -101,6 +111,11 @@ services:
   # KAFKA UI
   # ============================================================
   kafka-ui:
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: '512M'
     image: provectuslabs/kafka-ui:latest
     container_name: leilao-kafka-ui
     networks:
@@ -119,6 +134,11 @@ services:
   # KAFKA CONNECT
   # ============================================================
   kafka-connect:
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: '1G'
     image: debezium/connect:2.7.3.Final
     container_name: auction-kafka-connect
     ports:
@@ -170,6 +190,11 @@ services:
   # KSQL SERVER
   # ============================================================
   ksqldb-server:
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: '1G'
     image: confluentinc/ksqldb-server:0.29.0
     container_name: ksqldb-server
     networks:
@@ -233,6 +258,11 @@ services:
   # KEYCLOAK
   # ============================================================
   keycloak:
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: '1G'
     container_name: keycloak
     image: quay.io/keycloak/keycloak:26.6.2
     volumes:
@@ -278,6 +308,11 @@ services:
   # API GATEWAY
   # ============================================================
   api-gateway:
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: '512M'
     container_name: api-gateway
     image: shyuu7/api-gateway:latest
     ports:
@@ -311,6 +346,11 @@ services:
   # PROMETHEUS
   # ============================================================
   prometheus:
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: '512M'
     image: prom/prometheus:latest
     container_name: oleiloeiro-prometheus
     networks:
@@ -329,6 +369,11 @@ services:
   # GRAFANA
   # ============================================================
   grafana:
+    deploy:
+      resources:
+        limits:
+          cpus: '0.2'
+          memory: '256M'
     image: grafana/grafana:latest
     container_name: oleiloeiro-grafana
     networks:
@@ -349,6 +394,11 @@ services:
   # ELASTICSEARCH
   # ============================================================
   elasticsearch:
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: '1G'
     image: docker.elastic.co/elasticsearch/elasticsearch:9.4.2
     container_name: elasticsearch
     environment:
@@ -365,6 +415,11 @@ services:
   # KIBANA
   # ============================================================
   kibana:
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: '512M'
     image: docker.elastic.co/kibana/kibana:9.4.2
     container_name: kibana
     environment:
@@ -380,6 +435,11 @@ services:
   # LOGSTASH
   # ============================================================
   logstash:
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: '1G'
     image: docker.elastic.co/logstash/logstash:9.4.2
     container_name: logstash
     ports:
@@ -397,6 +457,11 @@ services:
   # OPEN TELEMETRY COLLECTOR
   # ============================================================
   otel-collector:
+    deploy:
+      resources:
+        limits:
+          cpus: '0.2'
+          memory: '256M'
     image: otel/opentelemetry-collector-contrib:latest
     container_name: oleiloeiro-otel-collector
     networks:
@@ -415,6 +480,11 @@ services:
   # GRAFANA TEMPO
   # ============================================================
   tempo:
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: '512M'
     image: grafana/tempo:latest
     container_name: oleiloeiro-tempo
     user: "0:0"
@@ -433,6 +503,11 @@ services:
   # FRONTEND
   # ============================================================
   frontend:
+    deploy:
+      resources:
+        limits:
+          cpus: '0.2'
+          memory: '128M'
     image: nginx:alpine
     container_name: leilao-frontend
     ports:
@@ -450,6 +525,11 @@ services:
   # USER-SERVICE REDIS
   # ============================================================
   user-service-redis:
+    deploy:
+      resources:
+        limits:
+          cpus: '0.2'
+          memory: '128M'
     image: redis:8.8.0-alpine
     container_name: user-service-redis
     ports:
@@ -468,6 +548,11 @@ services:
   # USER-SERVICE DATABASE
   # ============================================================
   user-service-db:
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: '512M'
     container_name: user-service-db
     image: postgres:17-alpine3.23
     volumes:
@@ -493,6 +578,11 @@ services:
   # PAYMENT-SERVICE DATABASE
   # ============================================================
   paymentdb:
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: '512M'
     container_name: paymentdb
     image: postgres:17-alpine3.23
     networks:
@@ -518,6 +608,11 @@ services:
   # REVIEW-SERVICE DATABASE
   # ============================================================
   review-postgres:
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: '512M'
     image: postgres:17-alpine3.23
     container_name: review-postgres
     ports:
@@ -540,6 +635,11 @@ services:
   # AUCTION-SERVICE DATABASE
   # ============================================================
   auction-postgres:
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: '512M'
     image: postgres:17-alpine3.23
     container_name: auction-service-postgres
     environment:
@@ -570,6 +670,11 @@ services:
   # QA-SERVICE DATABASE
   # ============================================================
   postgres-qa:
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: '512M'
     image: postgres:17-alpine3.23
     container_name: qa-service-postgres
     environment:
@@ -592,6 +697,11 @@ services:
   # QA-SERVICE REDIS
   # ============================================================
   redis-qa:
+    deploy:
+      resources:
+        limits:
+          cpus: '0.2'
+          memory: '128M'
     image: redis:8.8.0-alpine
     container_name: qa-service-redis
     ports:
@@ -610,6 +720,11 @@ services:
   # NOTIFICATION-SERVICE DATABASE
   # ============================================================
   notificationdb:
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: '512M'
     container_name: notificationdb
     image: postgres:17-alpine3.23
     environment:
@@ -635,6 +750,11 @@ services:
   # REPORT-SERVICE DATABASE
   # ============================================================
   report-service-postgres:
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: '512M'
     image: postgres:17-alpine3.23
     container_name: report-service-postgres
     ports:
@@ -659,6 +779,11 @@ services:
   # TRANSACTION-SERVICE DATABASE
   # ============================================================
   transaction-service-db:
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: '512M'
     image: postgres:17-alpine3.23
     container_name: transaction-service-db
     environment:
@@ -684,6 +809,11 @@ services:
   # LISTING-SERVICE DATABASE
   # ============================================================
   listing-service-elastic:
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: '1.5G'
     image: docker.elastic.co/elasticsearch/elasticsearch:9.4.2
     container_name: listing-service-elastic
     environment:
@@ -708,6 +838,11 @@ services:
   # REPORT-SERVICE
   # ============================================================
   report-service:
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: '512M'
     container_name: report-service
     image: gabrielmeruzzi/report-service:latest
     restart: always
@@ -735,6 +870,11 @@ services:
   # USER-SERVICE
   # ============================================================
   user-service:
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: '512M'
     container_name: user-service
     image: shyuu7/user-service:latest
     restart: always
@@ -784,6 +924,11 @@ services:
   # NOTIFICATION-SERVICE
   # ============================================================
   notification-service:
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: '512M'
     container_name: notification-service
     image: oleiloeiroonline/notification-service:latest
     env_file:
@@ -814,6 +959,11 @@ services:
   # REVIEW-SERVICE
   # ============================================================
   review-service:
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: '512M'
     container_name: review-service
     image: gabrielmeruzzi/review-service:latest
     restart: always
@@ -843,6 +993,11 @@ services:
   # QA-SERVICE
   # ============================================================
   qa-service:
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: '512M'
     image: sylviocheleiro/qa-service:latest
     container_name: qa-service
     restart: unless-stopped
@@ -881,6 +1036,11 @@ services:
   # TRANSACTION-SERVICE
   # ============================================================
   transaction-service:
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: '512M'
     image: nelsongrossoni/transaction_service:v1.1.0
     container_name: transaction-service
     restart: always
@@ -918,6 +1078,11 @@ services:
   # PAYMENT-SERVICE
   # ============================================================
   payment-service:
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: '512M'
     image: oleiloeiroonline/payment-service:latest
     container_name: payment-service
     env_file:
@@ -942,6 +1107,11 @@ services:
   # LISTING-SERVICE
   # ============================================================
   listing-service:
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: '512M'
     image: pedrovncs/listing-service:latest
     container_name: listing-service
     ports:
@@ -972,6 +1142,11 @@ services:
   # AUCTION-SERVICE
   # ============================================================
   auction-service:
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: '512M'
     image: pedrovncs/auction-service:latest
     container_name: auction-service
     ports:

@@ -211,7 +211,7 @@
         (nota !== undefined && nota !== null ? linha("Reputação", "⭐ " + UI.esc(nota)) : "") +
         (local ? linha("Localização", UI.esc(local)) : "") +
         '</table>' +
-        '<a class="botao" href="perfil.html?id=' + encodeURIComponent(sellerId) + '">Ver perfil do vendedor</a>';
+        '<a class="botao" href="perfil-vendedor.html?id=' + encodeURIComponent(sellerId) + '">Ver perfil do vendedor</a>';
     } catch (e) {
       el.innerHTML = '<span class="dica">Não foi possível carregar os dados do vendedor.</span>';
     }

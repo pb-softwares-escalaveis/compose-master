@@ -1,4 +1,4 @@
-# Oleiloeiro Online — Frontend
+# O Leiloeiro Online — Frontend
 
 Frontend estático (HTML + CSS + JavaScript puro, sem build) com visual
 retrô dos anos 2000 para o backend de leilões. Conversa com o **API Gateway**

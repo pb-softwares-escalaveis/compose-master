@@ -67,17 +67,17 @@
     if (!el) return;
     const u = window.AUTH.getUsuario();
     const saudacao = (u && u.username)
-      ? 'Olá, <b>' + esc(u.username) + '</b>! | <a href="perfil.html">Meu Perfil</a> | <a href="#" onclick="AUTH.logout();return false;">Sair</a>'
-      : '<a href="login.html">Entrar</a> | <a href="cadastro.html">Cadastrar</a>';
+      ? 'Olá, <b>' + esc(u.username) + '</b>! | <a href="perfil.html" style="color: white;">Meu Perfil</a> | <a href="#" onclick="AUTH.logout();return false;" style="color: white;">Sair</a>'
+      : '<a href="login.html" style="color: white;">Entrar</a> | <a href="cadastro.html" style="color: white;">Cadastrar</a>';
 
     el.innerHTML = '' +
       '<div class="cabecalho">' +
         '<div style="float:right;font-size:11px;color:#fff;margin-top:6px">' + saudacao + '</div>' +
-        '<h1><span class="logo-martelo">🔨</span> Oleiloeiro Online</h1>' +
+        '<h1><span class="logo-martelo">🔨</span> O Leiloeiro Online</h1>' +
         '<div class="slogan">~ O maior portal de leilões da internet brasileira desde 2001 ~</div>' +
       '</div>' +
       '<marquee class="faixa-rolante" scrollamount="5">' +
-        '★ BEM-VINDO AO OLEILOEIRO ONLINE ★ Dê seu lance e arremate as melhores ofertas! ' +
+        '★ BEM-VINDO AO O LEILOEIRO ONLINE ★ Dê seu lance e arremate as melhores ofertas! ' +
         '★ Frete grátis em itens selecionados ★ Cadastre-se e ganhe ofertas exclusivas ★' +
       '</marquee>' +
       '<div class="menu">' +
@@ -103,9 +103,10 @@
       '<div class="rodape">' +
         '🚧 ' +
         'Você é o visitante número <span class="contador-visitas">' + visitas + '</span> 🚧<br>' +
-        '© 2001-2026 Oleiloeiro Online — Melhor visualizado em 800x600 com Internet Explorer 6.0<br>' +
-        '<a href="quem-somos.html">Quem Somos</a> | <a href="#">Fale Conosco</a> | <a href="#">Política de Privacidade</a> | ' +
-        '<a href="#">Ajuda</a> | <a href="#topo">Voltar ao topo ↑</a>' +
+        '© 2001-2026 O Leiloeiro Online — Melhor visualizado em 800x600 com Internet Explorer 6.0<br>' +
+        'Sede: Abraham de Veerstraat 9, Willemstad, Curaçao - Registration No. 149201<br>' +
+        '<a href="quem-somos.html">Quem Somos</a> | <a href="politica-privacidade.html">Política de Privacidade</a> | ' +
+        '<a href="https://github.com/pb-softwares-escalaveis" target="_blank"><img src="https://img.icons8.com/?size=100&id=3R1xLIHPgzn5&format=png&color=000000" width="16" height="16" alt="GitHub" border="0" align="absmiddle"> Código Fonte (GitHub)</a> | <a href="#topo">Voltar ao topo ↑</a>' +
       '</div>';
   }
 
@@ -113,6 +114,20 @@
   function iniciarPagina(paginaAtual) {
     montarTopo(paginaAtual);
     montarRodape();
+
+    // Favicon com martelo sombreado
+    const favicon = document.createElement("link");
+    favicon.rel = "icon";
+    favicon.href = "data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2280%22 filter=%22drop-shadow(3px 3px 5px rgba(0,0,0,0.7))%22>🔨</text></svg>";
+    document.head.appendChild(favicon);
+
+    // Efeito de marquee no título simulando páginas antigas
+    let tituloOriginal = document.title || "O Leiloeiro Online - Leilões na Internet";
+    let tituloText = " 🔨 " + tituloOriginal + " *** ";
+    setInterval(function() {
+      tituloText = tituloText.substring(1) + tituloText.charAt(0);
+      document.title = tituloText;
+    }, 250);
   }
 
   window.UI = {

@@ -1,70 +1,58 @@
 /* ============================================================
-   Lógica da página de perfil
-
-   Como o backend não tem endpoint "/me", o perfil é exibido a partir
-   de um UUID:
-   - ?id=<uuid> na URL (ex.: ao ver o perfil de um vendedor), OU
-   - o UUID guardado localmente após o cadastro / login.
-
-   Se o usuário não estiver identificado, mostramos a tela de
-   "entre ou cadastre-se".
+   Lógica da página Meu Perfil (apenas para o usuário logado)
    ============================================================ */
 (async function () {
   await window.AUTH.init();
   UI.iniciarPagina("perfil.html");
 
   const root = document.getElementById("conteudo-perfil");
-  const params = new URLSearchParams(window.location.search);
   const usuarioLocal = AUTH.getUsuario();
 
-  // Prioriza o id da URL; senão usa o do usuário identificado.
-  const id = params.get("id") || (usuarioLocal && usuarioLocal.userId);
-  const ehProprioPerfil = !params.get("id") && AUTH.estaIdentificado();
-
-  if (!id) {
+  if (!usuarioLocal || !usuarioLocal.userId) {
     mostrarConvite();
     return;
   }
 
-  carregar(id);
+  carregar(usuarioLocal.userId);
 
   async function carregar(uuid) {
     try {
-      // Perfil público (username, foto, reputação).
       const perfil = await API.profile(uuid);
-      // seller-info traz nome completo e localização (também público).
       let seller = null;
       try { seller = await API.sellerInfo(uuid); } catch (_) { /* opcional */ }
       
+      let me = null;
+      try { me = await API.me(); } catch (_) { /* opcional */ }
+      
       let payments = null;
-      if (ehProprioPerfil) {
-        try { payments = await API.getPayments(uuid); } catch (_) { /* opcional */ }
-      }
+      try { payments = await API.getPayments(uuid); } catch (_) { /* opcional */ }
 
-      renderizar(uuid, perfil, seller, payments);
+      renderizar(uuid, perfil, seller, payments, me);
     } catch (e) {
-      root.innerHTML = '<div class="caixa"><div class="titulo">Perfil</div>' +
+      root.innerHTML = '<div class="caixa"><div class="titulo">Meu Perfil</div>' +
         '<div class="corpo mensagem-erro">Não foi possível carregar este perfil: ' +
         UI.esc(e.message) + '</div></div>';
     }
   }
 
-  function renderizar(uuid, perfil, seller, payments) {
+  function renderizar(uuid, perfil, seller, payments, me) {
     const nomeCompleto = seller ? [seller.nome, seller.sobrenome].filter(Boolean).join(" ") : "";
     const local = seller ? [seller.cidade, seller.estado, seller.pais].filter(Boolean).join(", ") : "";
 
-    // 🔥 LIMPA O LINK DA FOTO (remove aspas)
     let foto = perfil.profilePicture || (seller && seller.fotoPerfil) || "";
-    foto = foto.replace(/^"|"$/g, '');  // Remove aspas do início e fim
+    foto = foto.replace(/^"|"$/g, ''); 
 
     const nota = (perfil.reputacao !== undefined && perfil.reputacao !== null)
         ? perfil.reputacao
         : (seller ? seller.nota : null);
 
+    const email = me ? (me.email || me.emailAddress) : null;
+    const cpf = me ? (me.cpf || me.document) : null;
+
     let html = '' +
         '<table class="layout"><tbody><tr>' +
         '<td class="coluna-lateral">' +
-        '<div class="caixa"><div class="titulo">' + (ehProprioPerfil ? '👤 Meu Perfil' : '👤 Perfil') + '</div>' +
+        '<div class="caixa"><div class="titulo">👤 Meu Perfil</div>' +
         '<div class="corpo centro">' +
         (foto ? '<img src="' + foto + '" style="width:100px;height:100px;border-radius:50%;border:3px outset #fff" onerror="this.src=\'img/sem-imagem.svg\'">'
             : '<img src="img/sem-imagem.svg" style="width:100px;height:100px">') +
@@ -72,60 +60,55 @@
         (nota !== null && nota !== undefined ? '<div>Reputação: ⭐ ' + UI.esc(nota) + '</div>' : '') +
         '</div>' +
         '</div>' +
-        (ehProprioPerfil ? '<div class="caixa"><div class="titulo">⚙️ Conta</div><div class="corpo">' +
-            '<button type="button" onclick="window.abrirModalFoto()" style="width:100%;margin-bottom:8px">📷 Trocar foto de perfil</button>' +
-            '<button type="button" onclick="AUTH.logout()" style="width:100%">Sair (logout)</button>' +
-            '</div></div>' : '') +
+        '<div class="caixa"><div class="titulo">⚙️ Conta</div><div class="corpo">' +
+        '<button type="button" onclick="window.abrirModalFoto()" style="width:100%;margin-bottom:8px">📷 Trocar foto de perfil</button>' +
+        '<button type="button" onclick="AUTH.logout()" style="width:100%">Sair (logout)</button>' +
+        '</div></div>' +
         '</td>' +
 
         '<td class="conteudo">' +
-        '<div class="caixa"><div class="titulo">📇 Dados</div><div class="corpo">' +
+        '<div class="caixa"><div class="titulo">📇 Dados Pessoais (Privado)</div><div class="corpo">' +
         '<table class="tabela-dados">' +
         linha("Usuário", UI.esc(perfil.username)) +
+        (email ? linha("E-mail", UI.esc(email)) : "") +
+        (cpf ? linha("CPF", UI.esc(cpf)) : "") +
         (nomeCompleto ? linha("Nome", UI.esc(nomeCompleto)) : "") +
         (local ? linha("Localização", UI.esc(local)) : "") +
-        (nota !== null && nota !== undefined ? linha("Reputação", "⭐ " + UI.esc(nota)) : "") +
         linha("Código (UUID)", '<span class="dica">' + UI.esc(uuid) + '</span>') +
         '</table>' +
-        (ehProprioPerfil ? '<p class="dica">Para alterar dados sensíveis (e-mail, telefone, endereço) ' +
-            'utilize as opções da sua conta. Estas informações privadas não são exibidas publicamente.</p>' : '') +
+        '<p class="dica">Estas informações sensíveis não são exibidas publicamente para outros usuários.</p>' +
         '</div></div>';
 
-    if (ehProprioPerfil) {
-      html += '<div class="caixa" style="margin-top:15px"><div class="titulo">💳 Meus Pagamentos</div><div class="corpo">';
-      if (!payments || payments.length === 0) {
-        html += '<span class="dica">Nenhum pagamento encontrado.</span>';
-      } else {
-        html += '<table class="tabela-dados" style="width: 100%; text-align: left;">' +
-                '<tr><th>ID</th><th>Lote</th><th>Valor</th><th>Status</th><th>Ação</th></tr>';
-        payments.forEach(function(p) {
-          const statusStr = UI.esc(p.status);
-          let acaoHtml = "-";
-          if ((p.status === "PENDING" || p.status === "WAITING_PAYMENT") && p.id) {
-            acaoHtml = '<button type="button" class="btn-simular-pgto" data-pid="' + UI.esc(p.id) + '" style="font-size:0.8em; padding: 3px 8px; cursor: pointer;">Pagar (Simular)</button>';
-          }
-          let idStr = p.id ? String(p.id).substring(0, 8) + "..." : "N/A";
-          let valorNum = p.amountInCents ? (p.amountInCents / 100) : 0;
-          
-          html += '<tr>' +
-                  '<td><span title="' + UI.esc(p.id) + '" style="cursor:help;">' + UI.esc(idStr) + '</span></td>' +
-                  '<td>' + UI.esc(p.auctionId) + '</td>' +
-                  '<td>' + UI.dinheiro(valorNum) + '</td>' +
-                  '<td>' + statusStr + '</td>' +
-                  '<td>' + acaoHtml + '</td>' +
-                  '</tr>';
-        });
-        html += '</table><div id="msg-pgto" style="margin-top:10px;"></div>';
-      }
-      html += '</div></div>';
+    html += '<div class="caixa" style="margin-top:15px"><div class="titulo">💳 Meus Pagamentos</div><div class="corpo">';
+    if (!payments || payments.length === 0) {
+      html += '<span class="dica">Nenhum pagamento encontrado.</span>';
+    } else {
+      html += '<table class="tabela-dados" style="width: 100%; text-align: left;">' +
+              '<tr><th>ID</th><th>Lote</th><th>Valor</th><th>Status</th><th>Ação</th></tr>';
+      payments.forEach(function(p) {
+        const statusStr = UI.esc(p.status);
+        let acaoHtml = "-";
+        if ((p.status === "PENDING" || p.status === "WAITING_PAYMENT") && p.id) {
+          acaoHtml = '<button type="button" class="btn-simular-pgto" data-pid="' + UI.esc(p.id) + '" style="font-size:0.8em; padding: 3px 8px; cursor: pointer;">Pagar (Simular)</button>';
+        }
+        let idStr = p.id ? String(p.id).substring(0, 8) + "..." : "N/A";
+        let valorNum = p.amountInCents ? (p.amountInCents / 100) : 0;
+        
+        html += '<tr>' +
+                '<td><span title="' + UI.esc(p.id) + '" style="cursor:help;">' + UI.esc(idStr) + '</span></td>' +
+                '<td>' + UI.esc(p.auctionId) + '</td>' +
+                '<td>' + UI.dinheiro(valorNum) + '</td>' +
+                '<td>' + statusStr + '</td>' +
+                '<td>' + acaoHtml + '</td>' +
+                '</tr>';
+      });
+      html += '</table><div id="msg-pgto" style="margin-top:10px;"></div>';
     }
-
+    html += '</div></div>';
     html += '</td></tr></tbody></table>';
     root.innerHTML = html;
     
-    if (ehProprioPerfil) {
-       ligarPagamentos();
-    }
+    ligarPagamentos();
   }
 
   function ligarPagamentos() {
@@ -166,7 +149,6 @@
       '</div>';
   }
 
-  // 🔥 FUNÇÃO 1: Abrir modal com as fotos disponíveis
   window.abrirModalFoto = async function () {
     try {
       const pfps = await API.listPfps();
@@ -182,9 +164,7 @@
           '<div class="corpo" style="display:flex;flex-wrap:wrap;gap:15px;justify-content:center;max-height:60vh;overflow-y:auto;padding:15px 0;">';
 
       pfps.forEach(link => {
-        // 🔥 Remove QUAISQUER aspas extras do link
         const linkLimpo = link.replace(/^"|"$/g, '');
-
         html += '<img src="' + linkLimpo + '" ' +
             'data-link="' + linkLimpo + '" ' +
             'style="width:80px;height:80px;border-radius:50%;cursor:pointer;border:3px solid transparent;transition:transform 0.2s" ' +
@@ -205,12 +185,8 @@
     }
   };
 
-// 🔥 FUNÇÃO 2: Salvar a foto selecionada
   window.salvarFoto = async function (imgElement) {
-    // 🔥 Pega o link do atributo data-link
     let link = imgElement.dataset.link;
-
-    // 🔥 Remove aspas extras
     link = link.replace(/^"|"$/g, '');
 
     if (!link || link.trim() === '') {
@@ -219,7 +195,6 @@
     }
 
     imgElement.style.opacity = '0.5';
-
     try {
       await API.changePfp(link);
       window.location.reload();

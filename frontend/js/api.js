@@ -74,6 +74,9 @@
     autocomplete: function (q) {
       return request("/listings/auctions/search/autocomplete" + qs({ q: q }));
     },
+    sellerListings: function (sellerId, page, size) {
+      return request("/listings/auctions/search" + qs({ sellerId: sellerId, page: page, size: size }));
+    },
 
     // ---------- RECOMMENDATION-SERVICE (futuro) ----------
     recommendations: function (params) {
@@ -130,8 +133,7 @@
       return request("/payments/bidder/" + encodeURIComponent(userId));
     },
     simulatePayment: function (providerPaymentId) {
-      // Usamos a rota que o Gateway suporta
-      return request("/simulate/" + encodeURIComponent(providerPaymentId), { method: "POST" });
+      return request("/payments/simulate/" + encodeURIComponent(providerPaymentId), { method: "POST" });
     }
   };
 })();

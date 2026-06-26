@@ -1,5 +1,5 @@
 /* ============================================================
-   Configuração global do Oleiloeiro Online
+   Configuração global do O Leiloeiro Online
    ============================================================ */
 window.CONFIG = {
   // Todas as chamadas passam pelo API Gateway.
