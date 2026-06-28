@@ -3,16 +3,16 @@
    ============================================================ */
 window.CONFIG = {
   // Todas as chamadas passam pelo API Gateway.
-  API_BASE: "http://localhost:9999",
+  API_BASE: "http://oleiloeiroonline.top:9999",
 
   // Login é feito pelo Keycloak via OAuth2 do gateway.
   // O Spring Security inicia o fluxo nesta rota e redireciona para o Keycloak.
-  LOGIN_URL: "http://localhost:9999/oauth2/authorization/keycloak",
-  LOGOUT_URL: "http://localhost:9999/logout",
+  LOGIN_URL: "http://oleiloeiroonline.top:9999/oauth2/authorization/keycloak",
+  LOGOUT_URL: "http://oleiloeiroonline.top:9999/logout",
 
   // Para onde o gateway deve devolver o navegador após o login.
   // (precisa estar entre os Redirect URIs permitidos no realm do Keycloak)
-  FRONTEND_BASE: "http://localhost:3000",
+  FRONTEND_BASE: "http://oleiloeiroonline.top",
 
   // Categorias aceitas pelo listing-service (enum AuctionLotCategory).
   CATEGORIAS: {
