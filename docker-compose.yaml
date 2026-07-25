@@ -16,6 +16,8 @@ volumes:
   oleiloeiro-prometheus-data:
   oleiloeiro-grafana-data:
   tempo-data:
+  caddy-data:
+  caddy-config:
 
 networks:
   leilao-network:
@@ -29,24 +31,30 @@ services:
   # EUREKA SERVER
   # ============================================================
   eureka-server:
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: '512M'
     container_name: eureka-server
-    image: steeltoeoss/eureka-server:latest
+    image: pedrovncs/eureka-server:arm64
     ports:
       - "8761:8761"
     networks:
       - leilao-network
     restart: unless-stopped
     healthcheck:
-      test: [ "CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8761/actuator/health" ]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 60s
+      disable: true
 
   # ============================================================
   # KAFKA
   # ============================================================
   kafka:
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: '1G'
     image: apache/kafka:4.3.0
     container_name: leilao-kafka
     ports:
@@ -72,7 +80,7 @@ services:
       - leilao-kafka-data:/var/lib/kafka/data
     depends_on:
       eureka-server:
-        condition: service_healthy
+        condition: service_started
     healthcheck:
       test: [ "CMD-SHELL", "/opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list >/dev/null 2>&1" ]
       interval: 30s
@@ -90,7 +98,7 @@ services:
       kafka:
         condition: service_healthy
       eureka-server:
-        condition: service_healthy
+        condition: service_started
     environment:
       KAFKA_BOOTSTRAP_SERVERS: kafka:29092
     restart: "no"
@@ -101,6 +109,11 @@ services:
   # KAFKA UI
   # ============================================================
   kafka-ui:
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: '512M'
     image: provectuslabs/kafka-ui:latest
     container_name: leilao-kafka-ui
     networks:
@@ -119,6 +132,11 @@ services:
   # KAFKA CONNECT
   # ============================================================
   kafka-connect:
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: '1G'
     image: debezium/connect:2.7.3.Final
     container_name: auction-kafka-connect
     ports:
@@ -170,7 +188,12 @@ services:
   # KSQL SERVER
   # ============================================================
   ksqldb-server:
-    image: confluentinc/ksqldb-server:0.29.0
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: '1G'
+    image: confluentinc/cp-ksqldb-server:7.8.0
     container_name: ksqldb-server
     networks:
       - leilao-network
@@ -179,7 +202,7 @@ services:
       kafka:
         condition: service_healthy
       eureka-server:
-        condition: service_healthy
+        condition: service_started
     ports:
       - "8088:8088"
     environment:
@@ -196,11 +219,12 @@ services:
       retries: 10
       start_period: 90s
 
+
   # ============================================================
   # KSQL INIT
   # ============================================================
   ksqldb-init:
-    image: confluentinc/ksqldb-cli:0.29.0
+    image: confluentinc/cp-ksqldb-cli:7.8.0
     container_name: ksqldb-init
     networks:
       - leilao-network
@@ -219,7 +243,7 @@ services:
   # KSQL CLI
   # ============================================================
   ksqldb-cli:
-    image: confluentinc/ksqldb-cli:0.29.0
+    image: confluentinc/cp-ksqldb-cli:7.8.0
     container_name: ksqldb-cli
     networks:
       - leilao-network
@@ -233,11 +257,17 @@ services:
   # KEYCLOAK
   # ============================================================
   keycloak:
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: '1G'
     container_name: keycloak
     image: quay.io/keycloak/keycloak:26.6.2
     volumes:
       - keycloak-data:/opt/keycloak/data
       - ./realm-export.json:/opt/keycloak/data/import/realm-export.json
+      - ./keycloak-theme:/opt/keycloak/themes
     environment:
       KC_BOOTSTRAP_ADMIN_USERNAME: ${KEYCLOAK_ADMIN_USER}
       KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
@@ -248,11 +278,11 @@ services:
       MAIL_REPLY_TO: ${MAIL_REPLY_TO}
       KC_DB: postgres
       KC_DB_URL: ${KEYCLOAK_DB_URL}
-      KC_HOSTNAME: keycloak
-      KC_HOSTNAME_PORT: 8080
+      KC_HOSTNAME_URL: ${KEYCLOAK_EXTERNAL_URL}
+      KC_HOSTNAME_ADMIN_URL: ${KEYCLOAK_EXTERNAL_URL}
       KC_HOSTNAME_STRICT: false
-      KC_PROXY: edge
-      KC_FRONTEND_URL: ${KEYCLOAK_EXTERNAL_URL}
+      KC_HTTP_ENABLED: true
+      KC_PROXY_HEADERS: xforwarded
       KC_DB_USERNAME: ${USER_SERVICE_DB_USER}
       KC_DB_PASSWORD: ${USER_SERVICE_DB_PASSWORD}
       KC_HEALTH_ENABLED: true
@@ -266,7 +296,7 @@ services:
       user-service-db:
         condition: service_healthy
       eureka-server:
-        condition: service_healthy
+        condition: service_started
     healthcheck:
       test: [ "CMD-SHELL", "cat /dev/null > /dev/tcp/127.0.0.1/8080 || exit 1" ]
       interval: 30s
@@ -278,12 +308,15 @@ services:
   # API GATEWAY
   # ============================================================
   api-gateway:
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: '512M'
     container_name: api-gateway
     image: shyuu7/api-gateway:latest
-    ports:
-      - "9999:9999"
-    networks:
-      - leilao-network
+    expose:
+      - "9999"
     environment:
       EUREKA_SERVER_URL: ${EUREKA_SERVER_URL}
       KEYCLOAK_INTERNAL_URL: ${KEYCLOAK_INTERNAL_URL}
@@ -292,25 +325,52 @@ services:
       EUREKA_CLIENT_REGISTER_WITH_EUREKA: false
       EUREKA_CLIENT_FETCH_REGISTRY: ${EUREKA_CLIENT_FETCH_REGISTRY}
       FRONTEND_URL: ${FRONTEND_URL}
+      SERVER_FORWARD_HEADERS_STRATEGY: FRAMEWORK
+      SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_KEYCLOAK_REDIRECT_URI: "https://oleiloeiroonline.top/login/oauth2/code/keycloak"
     restart: unless-stopped
     healthcheck:
-      test: [ "CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:9999/actuator/health" ]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 120s
+      disable: true
     depends_on:
       eureka-server:
-        condition: service_healthy
+        condition: service_started
       keycloak:
         condition: service_healthy
       user-service:
-        condition: service_healthy
+        condition: service_started
+    networks:
+      - leilao-network
+
+  # ============================================================
+  # CADDY (REVERSE PROXY + AUTO TLS)
+  # ============================================================
+  caddy:
+    image: caddy:2-alpine
+    container_name: caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      - frontend
+      - keycloak
+      - api-gateway
+    networks:
+      - leilao-network
 
   # ============================================================
   # PROMETHEUS
   # ============================================================
   prometheus:
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: '512M'
     image: prom/prometheus:latest
     container_name: oleiloeiro-prometheus
     networks:
@@ -329,6 +389,11 @@ services:
   # GRAFANA
   # ============================================================
   grafana:
+    deploy:
+      resources:
+        limits:
+          cpus: '0.2'
+          memory: '256M'
     image: grafana/grafana:latest
     container_name: oleiloeiro-grafana
     networks:
@@ -349,6 +414,11 @@ services:
   # ELASTICSEARCH
   # ============================================================
   elasticsearch:
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: '1G'
     image: docker.elastic.co/elasticsearch/elasticsearch:9.4.2
     container_name: elasticsearch
     environment:
@@ -365,6 +435,11 @@ services:
   # KIBANA
   # ============================================================
   kibana:
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: '512M'
     image: docker.elastic.co/kibana/kibana:9.4.2
     container_name: kibana
     environment:
@@ -380,6 +455,11 @@ services:
   # LOGSTASH
   # ============================================================
   logstash:
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: '1G'
     image: docker.elastic.co/logstash/logstash:9.4.2
     container_name: logstash
     ports:
@@ -397,6 +477,11 @@ services:
   # OPEN TELEMETRY COLLECTOR
   # ============================================================
   otel-collector:
+    deploy:
+      resources:
+        limits:
+          cpus: '0.2'
+          memory: '256M'
     image: otel/opentelemetry-collector-contrib:latest
     container_name: oleiloeiro-otel-collector
     networks:
@@ -415,6 +500,11 @@ services:
   # GRAFANA TEMPO
   # ============================================================
   tempo:
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: '512M'
     image: grafana/tempo:latest
     container_name: oleiloeiro-tempo
     user: "0:0"
@@ -433,10 +523,15 @@ services:
   # FRONTEND
   # ============================================================
   frontend:
+    deploy:
+      resources:
+        limits:
+          cpus: '0.2'
+          memory: '128M'
     image: nginx:alpine
     container_name: leilao-frontend
-    ports:
-      - "3000:80"
+    expose:
+      - "80"
     volumes:
       - ./frontend:/usr/share/nginx/html:ro
       - ./frontend/nginx.conf:/etc/nginx/conf.d/default.conf:ro
@@ -450,6 +545,11 @@ services:
   # USER-SERVICE REDIS
   # ============================================================
   user-service-redis:
+    deploy:
+      resources:
+        limits:
+          cpus: '0.2'
+          memory: '128M'
     image: redis:8.8.0-alpine
     container_name: user-service-redis
     ports:
@@ -468,6 +568,11 @@ services:
   # USER-SERVICE DATABASE
   # ============================================================
   user-service-db:
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: '512M'
     container_name: user-service-db
     image: postgres:17-alpine3.23
     volumes:
@@ -493,6 +598,11 @@ services:
   # PAYMENT-SERVICE DATABASE
   # ============================================================
   paymentdb:
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: '512M'
     container_name: paymentdb
     image: postgres:17-alpine3.23
     networks:
@@ -518,6 +628,11 @@ services:
   # REVIEW-SERVICE DATABASE
   # ============================================================
   review-postgres:
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: '512M'
     image: postgres:17-alpine3.23
     container_name: review-postgres
     ports:
@@ -540,6 +655,11 @@ services:
   # AUCTION-SERVICE DATABASE
   # ============================================================
   auction-postgres:
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: '512M'
     image: postgres:17-alpine3.23
     container_name: auction-service-postgres
     environment:
@@ -570,6 +690,11 @@ services:
   # QA-SERVICE DATABASE
   # ============================================================
   postgres-qa:
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: '512M'
     image: postgres:17-alpine3.23
     container_name: qa-service-postgres
     environment:
@@ -592,6 +717,11 @@ services:
   # QA-SERVICE REDIS
   # ============================================================
   redis-qa:
+    deploy:
+      resources:
+        limits:
+          cpus: '0.2'
+          memory: '128M'
     image: redis:8.8.0-alpine
     container_name: qa-service-redis
     ports:
@@ -610,6 +740,11 @@ services:
   # NOTIFICATION-SERVICE DATABASE
   # ============================================================
   notificationdb:
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: '512M'
     container_name: notificationdb
     image: postgres:17-alpine3.23
     environment:
@@ -635,6 +770,11 @@ services:
   # REPORT-SERVICE DATABASE
   # ============================================================
   report-service-postgres:
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: '512M'
     image: postgres:17-alpine3.23
     container_name: report-service-postgres
     ports:
@@ -659,6 +799,11 @@ services:
   # TRANSACTION-SERVICE DATABASE
   # ============================================================
   transaction-service-db:
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: '512M'
     image: postgres:17-alpine3.23
     container_name: transaction-service-db
     environment:
@@ -684,6 +829,11 @@ services:
   # LISTING-SERVICE DATABASE
   # ============================================================
   listing-service-elastic:
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: '1.5G'
     image: docker.elastic.co/elasticsearch/elasticsearch:9.4.2
     container_name: listing-service-elastic
     environment:
@@ -708,8 +858,13 @@ services:
   # REPORT-SERVICE
   # ============================================================
   report-service:
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: '512M'
     container_name: report-service
-    image: gabrielmeruzzi/report-service:latest
+    image: pedrovncs/report-service:arm64
     restart: always
     ports:
       - "${REPORT_SERVICE_PORT}:8081"
@@ -735,6 +890,11 @@ services:
   # USER-SERVICE
   # ============================================================
   user-service:
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: '512M'
     container_name: user-service
     image: shyuu7/user-service:latest
     restart: always
@@ -770,32 +930,29 @@ services:
       kafka:
         condition: service_healthy
       eureka-server:
-        condition: service_healthy
+        condition: service_started
       kafka-init:
         condition: service_completed_successfully
     healthcheck:
-      test: [ "CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/actuator/health" ]
-      interval: 30s
-      timeout: 10s
-      retries: 10
-      start_period: 120s
+      disable: true
 
   # ============================================================
   # NOTIFICATION-SERVICE
   # ============================================================
   notification-service:
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: '512M'
     container_name: notification-service
-    image: oleiloeiroonline/notification-service:latest
+    image: pedrovncs/notification-service:arm64
     env_file:
       - .env
     ports:
       - "${NOTIFICATION_SERVICE_PORT}:8080"
     healthcheck:
-      test: [ "CMD-SHELL", "wget -qO- http://localhost:8080/actuator/health || exit 1" ]
-      interval: 20s
-      timeout: 10s
-      retries: 5
-      start_period: 40s
+      disable: true
     depends_on:
       notificationdb:
         condition: service_healthy
@@ -804,7 +961,7 @@ services:
       kafka:
         condition: service_healthy
       eureka-server:
-        condition: service_healthy
+        condition: service_started
       ksqldb-init:
         condition: service_completed_successfully
     networks:
@@ -814,8 +971,13 @@ services:
   # REVIEW-SERVICE
   # ============================================================
   review-service:
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: '512M'
     container_name: review-service
-    image: gabrielmeruzzi/review-service:latest
+    image: shyuu7/review-service:latest
     restart: always
     ports:
       - "${REVIEW_SERVICE_PORT}:8084"
@@ -843,7 +1005,12 @@ services:
   # QA-SERVICE
   # ============================================================
   qa-service:
-    image: sylviocheleiro/qa-service:latest
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: '512M'
+    image: pedrovncs/qa-service:arm64
     container_name: qa-service
     restart: unless-stopped
     ports:
@@ -862,11 +1029,7 @@ services:
       QA_SERVICE_REDIS_PORT: ${QA_SERVICE_REDIS_PORT}
       LOGSTASH_HOST: ${LOGSTASH_HOST}
     healthcheck:
-      test: [ "CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/actuator/health" ]
-      interval: 30s
-      timeout: 10s
-      retries: 10
-      start_period: 120s
+      disable: true
     depends_on:
       postgres-qa:
         condition: service_healthy
@@ -881,7 +1044,12 @@ services:
   # TRANSACTION-SERVICE
   # ============================================================
   transaction-service:
-    image: nelsongrossoni/transaction_service:v1.1.0
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: '512M'
+    image: pedrovncs/transaction-service:arm64
     container_name: transaction-service
     restart: always
     ports:
@@ -904,32 +1072,29 @@ services:
       kafka:
         condition: service_healthy
       eureka-server:
-        condition: service_healthy
+        condition: service_started
       kafka-init:
         condition: service_completed_successfully
     healthcheck:
-      test: [ "CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/actuator/health" ]
-      interval: 30s
-      timeout: 10s
-      retries: 10
-      start_period: 120s
+      disable: true
 
   # ============================================================
   # PAYMENT-SERVICE
   # ============================================================
   payment-service:
-    image: oleiloeiroonline/payment-service:latest
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: '512M'
+    image: pedrovncs/payment-service:arm64
     container_name: payment-service
     env_file:
       - .env
     ports:
       - "${PAYMENT_SERVICE_PORT}:8080"
     healthcheck:
-      test: [ "CMD-SHELL", "wget -qO- http://localhost:8080/actuator/health || exit 1" ]
-      interval: 20s
-      timeout: 10s
-      retries: 5
-      start_period: 40s
+      disable: true
     depends_on:
       paymentdb:
         condition: service_healthy
@@ -942,7 +1107,12 @@ services:
   # LISTING-SERVICE
   # ============================================================
   listing-service:
-    image: pedrovncs/listing-service:latest
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: '512M'
+    image: pedrovncs/listing-service:arm64
     container_name: listing-service
     ports:
       - "${LISTING_SERVICE_PORT}:8080"
@@ -955,11 +1125,7 @@ services:
       EUREKA_CLIENT_FETCH_REGISTRY: ${EUREKA_CLIENT_FETCH_REGISTRY}
       LOGSTASH_HOST: ${LOGSTASH_HOST}
     healthcheck:
-      test: [ "CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/actuator/health" ]
-      interval: 30s
-      timeout: 10s
-      retries: 10
-      start_period: 120s
+      disable: true
     depends_on:
       listing-service-elastic:
         condition: service_healthy
@@ -972,7 +1138,12 @@ services:
   # AUCTION-SERVICE
   # ============================================================
   auction-service:
-    image: pedrovncs/auction-service:latest
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: '512M'
+    image: pedrovncs/auction-service:arm64
     container_name: auction-service
     ports:
       - "${AUCTION_SERVICE_PORT}:8080"

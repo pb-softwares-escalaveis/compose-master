@@ -1,0 +1,30 @@
+oleiloeiroonline.top {
+	handle /api-gateway/* {
+		uri strip_prefix /api-gateway
+		reverse_proxy api-gateway:9999
+	}
+
+	handle /oauth2/* {
+		reverse_proxy api-gateway:9999
+	}
+
+	handle /login/* {
+		reverse_proxy api-gateway:9999
+	}
+
+	handle /logout {
+		reverse_proxy api-gateway:9999
+	}
+
+	handle {
+		reverse_proxy leilao-frontend:80
+	}
+}
+
+auth.oleiloeiroonline.top {
+	reverse_proxy keycloak:8080
+}
+
+api.oleiloeiroonline.top {
+	reverse_proxy api-gateway:9999
+}

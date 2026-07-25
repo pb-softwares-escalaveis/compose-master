@@ -52,12 +52,12 @@
       : '<img src="img/sem-imagem.svg" alt="sem imagem">';
     return '' +
       '<div class="cartao-lote">' +
-        '<a href="lote.html?id=' + encodeURIComponent(id) + '">' + img + '</a>' +
-        '<div class="titulo-lote">' + esc(lote.title) + '</div>' +
-        '<div class="categoria">' + esc(categoria(lote.category)) + '</div>' +
-        '<div class="preco">' + dinheiro(lote.currentBidPrice) + '</div>' +
-        (lote.expirationDate ? '<div class="dica">' + esc(tempoRestante(lote.expirationDate)) + '</div>' : '') +
-        '<a class="botao" href="lote.html?id=' + encodeURIComponent(id) + '">Ver lote &raquo;</a>' +
+      '<a href="lote.html?id=' + encodeURIComponent(id) + '">' + img + '</a>' +
+      '<div class="titulo-lote">' + esc(lote.title) + '</div>' +
+      '<div class="categoria">' + esc(categoria(lote.category)) + '</div>' +
+      '<div class="preco">' + dinheiro(lote.currentBidPrice) + '</div>' +
+      (lote.expirationDate ? '<div class="dica">' + esc(tempoRestante(lote.expirationDate)) + '</div>' : '') +
+      '<a class="botao" href="lote.html?id=' + encodeURIComponent(id) + '">Ver lote &raquo;</a>' +
       '</div>';
   }
 
@@ -72,21 +72,21 @@
 
     el.innerHTML = '' +
       '<div class="cabecalho">' +
-        '<div style="float:right;font-size:11px;color:#fff;margin-top:6px">' + saudacao + '</div>' +
-        '<h1><span class="logo-martelo">🔨</span> O Leiloeiro Online</h1>' +
-        '<div class="slogan">~ O maior portal de leilões da internet brasileira desde 2001 ~</div>' +
+      '<div style="float:right;font-size:11px;color:#fff;margin-top:6px">' + saudacao + '</div>' +
+      '<h1><span class="logo-martelo">🔨</span> O Leiloeiro Online</h1>' +
+      '<div class="slogan">~ O maior portal de leilões da internet brasileira desde 2001 ~</div>' +
       '</div>' +
       '<marquee class="faixa-rolante" scrollamount="5">' +
-        '★ BEM-VINDO AO O LEILOEIRO ONLINE ★ Dê seu lance e arremate as melhores ofertas! ' +
-        '★ Frete grátis em itens selecionados ★ Cadastre-se e ganhe ofertas exclusivas ★' +
+      '★ BEM-VINDO AO O LEILOEIRO ONLINE ★ Dê seu lance e arremate as melhores ofertas! ' +
+      '★ Frete grátis em itens selecionados ★ Cadastre-se e ganhe ofertas exclusivas ★' +
       '</marquee>' +
       '<div class="menu">' +
-        link("index.html", "🏠 Início", paginaAtual) +
-        link("busca.html", "🔍 Buscar Lotes", paginaAtual) +
-        link("criar-anuncio.html", "➕ Criar Anúncio", paginaAtual) +
-        link("perfil.html", "👤 Meu Perfil", paginaAtual) +
-        link("cadastro.html", "📝 Cadastre-se", paginaAtual) +
-        link("login.html", "🔑 Entrar", paginaAtual) +
+      link("index.html", "🏠 Início", paginaAtual) +
+      link("busca.html", "🔍 Buscar Lotes", paginaAtual) +
+      link("criar-anuncio.html", "➕ Criar Anúncio", paginaAtual) +
+      link("perfil.html", "👤 Meu Perfil", paginaAtual) +
+      (u && u.username ? "" : link("cadastro.html", "📝 Cadastre-se", paginaAtual)) +
+      (u && u.username ? "" : link("login.html", "🔑 Entrar", paginaAtual)) +
       '</div>';
   }
 
@@ -98,16 +98,56 @@
   function montarRodape() {
     const el = document.getElementById("rodape");
     if (!el) return;
-    const visitas = 1000000 + Math.floor((Date.now() / 1000) % 99999);
     el.innerHTML = '' +
       '<div class="rodape">' +
-        '🚧 ' +
-        'Você é o visitante número <span class="contador-visitas">' + visitas + '</span> 🚧<br>' +
-        '© 2001-2026 O Leiloeiro Online — Melhor visualizado em 800x600 com Internet Explorer 6.0<br>' +
-        'Sede: Abraham de Veerstraat 9, Willemstad, Curaçao - Registration No. 149201<br>' +
-        '<a href="quem-somos.html">Quem Somos</a> | <a href="politica-privacidade.html">Política de Privacidade</a> | ' +
-        '<a href="https://github.com/pb-softwares-escalaveis" target="_blank"><img src="https://img.icons8.com/?size=100&id=3R1xLIHPgzn5&format=png&color=000000" width="16" height="16" alt="GitHub" border="0" align="absmiddle"> Código Fonte (GitHub)</a> | <a href="#topo">Voltar ao topo ↑</a>' +
+      '🚧 ' +
+      'Você é o visitante número <span class="contador-visitas" id="contador-visitas">...</span> 🚧<br>' +
+      '© 2001-2026 O Leiloeiro Online — Melhor visualizado em 800x600 com Internet Explorer 6.0<br>' +
+      'Sede: Abraham de Veerstraat 9, Willemstad, Curaçao - Registration No. 149201<br>' +
+      '<a href="quem-somos.html">Quem Somos</a> | <a href="politica-privacidade.html">Política de Privacidade</a> | ' +
+      '<a href="https://github.com/pb-softwares-escalaveis" target="_blank"><img src="https://img.icons8.com/?size=100&id=3R1xLIHPgzn5&format=png&color=000000" width="16" height="16" alt="GitHub" border="0" align="absmiddle"> Código Fonte (GitHub)</a> | <a href="#topo">Voltar ao topo ↑</a>' +
       '</div>';
+
+    // Contador de visitas universal via CountAPI
+    // Usa sessionStorage para evitar contar o mesmo usuário várias vezes na mesma sessão
+    var jaContou = sessionStorage.getItem("visitaContada");
+    var endpoint = jaContou
+      ? "https://countapi.mileshilliard.com/api/v1/get/oleiloeiroonline_visitas"
+      : "https://countapi.mileshilliard.com/api/v1/hit/oleiloeiroonline_visitas";
+
+    function renderFlipDigits(text, animate) {
+      var padded = String(text).padStart(10, "0");
+      var container = document.getElementById("contador-visitas");
+      var oldDigits = container ? container.querySelectorAll(".flip-digit") : [];
+      var html = "";
+      for (var i = 0; i < padded.length; i++) {
+        var ch = padded[i];
+        var changed = animate && oldDigits.length === padded.length && oldDigits[i].textContent !== ch;
+        html += '<span class="flip-digit' + (changed ? ' flip-anim' : '') + '">' + ch + '</span>';
+      }
+      return html;
+    }
+
+    // Primeira chamada: hit ou get dependendo da sessão
+    fetch(endpoint)
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        var el = document.getElementById("contador-visitas");
+        if (el && data.value) el.innerHTML = renderFlipDigits(data.value, false);
+        if (!jaContou) sessionStorage.setItem("visitaContada", "1");
+      })
+      .catch(function () { /* mantém "..." se offline */ });
+
+    // Polling a cada 5 segundos (somente leitura)
+    setInterval(function () {
+      fetch("https://countapi.mileshilliard.com/api/v1/get/oleiloeiroonline_visitas")
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+          var el = document.getElementById("contador-visitas");
+          if (el && data.value) el.innerHTML = renderFlipDigits(data.value, true);
+        })
+        .catch(function () { });
+    }, 5000);
   }
 
   // Renderiza o chrome completo da página.
@@ -124,7 +164,7 @@
     // Efeito de marquee no título simulando páginas antigas
     let tituloOriginal = document.title || "O Leiloeiro Online - Leilões na Internet";
     let tituloText = " 🔨 " + tituloOriginal + " *** ";
-    setInterval(function() {
+    setInterval(function () {
       tituloText = tituloText.substring(1) + tituloText.charAt(0);
       document.title = tituloText;
     }, 250);

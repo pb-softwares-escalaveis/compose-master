@@ -126,6 +126,26 @@
     }, 300);
   }
 
+  // ---- Busca de CEP ----
+  document.getElementById("cep").addEventListener("blur", buscarCep);
+  async function buscarCep() {
+    const cep = soNumeros(val("cep"));
+    if (cep.length !== 8) return;
+    
+    try {
+      const resp = await fetch("https://viacep.com.br/ws/" + cep + "/json/");
+      const data = await resp.json();
+      if (!data.erro) {
+        if (data.logradouro) document.getElementById("rua").value = data.logradouro;
+        if (data.bairro) document.getElementById("bairro").value = data.bairro;
+        if (data.localidade) document.getElementById("cidade").value = data.localidade;
+        if (data.uf) document.getElementById("estado").value = data.uf;
+      }
+    } catch (e) {
+      console.error("Erro ao consultar CEP:", e);
+    }
+  }
+
   // ---- Resumo final ----
   function montarResumo() {
     const tel = soNumeros(val("telefone"));

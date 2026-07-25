@@ -190,11 +190,44 @@ input[type=date], input[type=tel], select, textarea {
   margin-top: 8px;
 }
 .contador-visitas {
-  background: #000;
-  color: #00ff00;
+  display: inline-flex;
+  gap: 2px;
+  vertical-align: middle;
+  margin: 4px 2px;
+}
+.flip-digit {
+  display: inline-block;
+  width: 14px;
+  height: 20px;
+  line-height: 20px;
+  text-align: center;
   font-family: "Courier New", monospace;
-  padding: 2px 6px;
-  border: 1px solid #444;
+  font-size: 12px;
+  font-weight: bold;
+  color: #e0f0ff;
+  background: linear-gradient(180deg, #1a3a6a 0%, #0d2240 49.9%, #0a1a30 50.1%, #0d2240 100%);
+  border: 1px solid #2a5a9a;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.5), inset 0 1px 0 rgba(100,160,255,0.15);
+  position: relative;
+}
+.flip-digit::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 1px;
+  background: rgba(0,0,0,0.6);
+  box-shadow: 0 1px 0 rgba(100,160,255,0.08);
+}
+.flip-digit.flip-anim {
+  animation: flipDown 0.4s ease-in-out;
+}
+@keyframes flipDown {
+  0%   { transform: perspective(100px) rotateX(90deg); opacity: 0.3; }
+  50%  { transform: perspective(100px) rotateX(-10deg); opacity: 1; }
+  100% { transform: perspective(100px) rotateX(0deg); opacity: 1; }
 }
 
 /* ---------- Diversos ---------- */

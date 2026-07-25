@@ -28,7 +28,8 @@
   "oauth2DeviceCodeLifespan": 600,
   "oauth2DevicePollingInterval": 5,
   "enabled": true,
-  "sslRequired": "external",
+  "loginTheme": "leiloeiro",
+  "sslRequired": "none",
   "registrationAllowed": false,
   "registrationEmailAsUsername": false,
   "rememberMe": false,
@@ -669,8 +670,12 @@
       "secret": "uh1FEIiOetIaktf54B2Xx4kHdvM4AYAt",
       "redirectUris": [
         "http://api-gateway:9999/login/oauth2/code/keycloak",
+        "https://api.oleiloeiroonline.top/login/oauth2/code/keycloak",
         "http://localhost:9999/login/oauth2/code/keycloak",
-        "http://frontend:3000/*"
+        "https://oleiloeiroonline.top/*",
+        "http://frontend:3000/*",
+        "https://api.oleiloeiroonline.top/*",
+        "https://oleiloeiroonline.top/*"
       ],
       "webOrigins": [
         ""
@@ -691,7 +696,7 @@
         "oauth2.jwt.authorization.grant.enabled": "false",
         "standard.token.exchange.enabled": "false",
         "frontchannel.logout.session.required": "true",
-        "post.logout.redirect.uris": "http://localhost:9999##http://api-gateway:9999/##http://frontend:3000/*##http://localhost:3000/*",
+        "post.logout.redirect.uris": "http://localhost:9999##http://api-gateway:9999/##https://api.oleiloeiroonline.top/##http://frontend:3000/*##http://localhost:3000/*##https://oleiloeiroonline.top/*##https://api.oleiloeiroonline.top/##https://oleiloeiroonline.top/*",
         "oauth2.device.authorization.grant.enabled": "false",
         "backchannel.logout.revoke.offline.tokens": "false",
         "realm_client": "false",
@@ -2702,7 +2707,7 @@
     "saml.signature.algorithm": "",
     "parRequestUriLifespan": "60",
     "clientSessionMaxLifespan": "0",
-    "frontendUrl": "http://localhost:8081",
+    "frontendUrl": "https://auth.oleiloeiroonline.top",
     "scimApiEnabled": "false",
     "acr.loa.map": "{}",
     "shortVerificationUri": "",

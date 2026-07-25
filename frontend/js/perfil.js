@@ -27,7 +27,20 @@
       let payments = null;
       try { payments = await API.getPayments(uuid); } catch (_) { /* opcional */ }
 
-      renderizar(uuid, perfil, seller, payments, me);
+      let transactions = [];
+      if (payments && payments.length > 0) {
+        try {
+          const txPromises = payments
+            .filter(p => p.transactionId)
+            .map(p => API.getTransaction(p.transactionId));
+          const txResults = await Promise.allSettled(txPromises);
+          transactions = txResults
+            .filter(res => res.status === "fulfilled" && res.value)
+            .map(res => res.value);
+        } catch (_) {}
+      }
+
+      renderizar(uuid, perfil, seller, payments, me, transactions);
     } catch (e) {
       root.innerHTML = '<div class="caixa"><div class="titulo">Meu Perfil</div>' +
         '<div class="corpo mensagem-erro">Não foi possível carregar este perfil: ' +
@@ -35,7 +48,7 @@
     }
   }
 
-  function renderizar(uuid, perfil, seller, payments, me) {
+  function renderizar(uuid, perfil, seller, payments, me, transactions) {
     const nomeCompleto = seller ? [seller.nome, seller.sobrenome].filter(Boolean).join(" ") : "";
     const local = seller ? [seller.cidade, seller.estado, seller.pais].filter(Boolean).join(", ") : "";
 
@@ -79,36 +92,108 @@
         '<p class="dica">Estas informações sensíveis não são exibidas publicamente para outros usuários.</p>' +
         '</div></div>';
 
-    html += '<div class="caixa" style="margin-top:15px"><div class="titulo">💳 Meus Pagamentos</div><div class="corpo">';
+    html += '<div class="caixa" style="margin-top:15px"><div class="titulo">💳 Meus Pagamentos & Transações</div><div class="corpo">';
     if (!payments || payments.length === 0) {
-      html += '<span class="dica">Nenhum pagamento encontrado.</span>';
+      html += '<span class="dica">Nenhum pagamento ou transação encontrado.</span>';
     } else {
       html += '<table class="tabela-dados" style="width: 100%; text-align: left;">' +
-              '<tr><th>ID</th><th>Lote</th><th>Valor</th><th>Status</th><th>Ação</th></tr>';
+              '<tr><th>Lote</th><th>Valor</th><th>Pagamento</th><th>Transação</th><th>Ações</th></tr>';
       payments.forEach(function(p) {
-        const statusStr = UI.esc(p.status);
-        let acaoHtml = "-";
-        if ((p.status === "PENDING" || p.status === "WAITING_PAYMENT") && p.id) {
-          acaoHtml = '<button type="button" class="btn-simular-pgto" data-pid="' + UI.esc(p.id) + '" style="font-size:0.8em; padding: 3px 8px; cursor: pointer;">Pagar (Simular)</button>';
+        const t = transactions ? transactions.find(tx => tx.id === p.transactionId) : null;
+        const pStatusStr = UI.esc(p.status);
+        const tStatusStr = t ? UI.esc(t.status) : "N/A";
+
+        let acaoHtml = [];
+        if ((p.status === "PENDING" || p.status === "WAITING_PAYMENT") && p.providerPaymentId) {
+          acaoHtml.push('<button type="button" class="btn-simular-pgto" data-pid="' + UI.esc(p.providerPaymentId) + '" style="font-size:0.8em; padding: 3px 8px; cursor: pointer;">Pagar (Simular)</button>');
         }
-        let idStr = p.id ? String(p.id).substring(0, 8) + "..." : "N/A";
+        if (t && t.status === "DELIVERY_PENDING") {
+          acaoHtml.push('<button type="button" class="btn-confirmar-entrega" data-tid="' + UI.esc(t.id) + '" style="font-size:0.8em; padding: 3px 8px; cursor: pointer;">Confirmar Recebimento</button>');
+        }
+        
+        let actions = acaoHtml.length > 0 ? acaoHtml.join(" ") : "-";
         let valorNum = p.amountInCents ? (p.amountInCents / 100) : 0;
         
         html += '<tr>' +
-                '<td><span title="' + UI.esc(p.id) + '" style="cursor:help;">' + UI.esc(idStr) + '</span></td>' +
                 '<td>' + UI.esc(p.auctionId) + '</td>' +
                 '<td>' + UI.dinheiro(valorNum) + '</td>' +
-                '<td>' + statusStr + '</td>' +
-                '<td>' + acaoHtml + '</td>' +
+                '<td>' + pStatusStr + '</td>' +
+                '<td><span title="' + (t ? UI.esc(t.id) : '') + '" style="cursor:help;">' + tStatusStr + '</span></td>' +
+                '<td>' + actions + '</td>' +
                 '</tr>';
       });
-      html += '</table><div id="msg-pgto" style="margin-top:10px;"></div>';
+      html += '</table><div id="msg-pgto" style="margin-top:10px;"></div><div id="msg-transacao" style="margin-top:10px;"></div>';
     }
     html += '</div></div>';
+    html += '<div class="caixa" style="margin-top:15px"><div class="titulo">📦 Meus Anúncios</div><div class="corpo">' +
+        '<div style="margin-bottom: 10px;">' +
+        '<select id="filtro-status-anuncios" style="padding: 5px;">' +
+        '<option value="ACTIVE">Ativos</option>' +
+        '<option value="PENDING_REVIEW">Pendentes de Revisão</option>' +
+        '<option value="REJECTED">Recusados</option>' +
+        '<option value="SOLD">Vendidos</option>' +
+        '<option value="EXPIRED">Expirados (Não vendidos)</option>' +
+        '<option value="CANCELED">Cancelados</option>' +
+        '</select>' +
+        '</div>' +
+        '<div id="meus-anuncios" class="grade-lotes"></div>' +
+        '<div id="area-carregar-mais-anuncios" class="centro" style="margin-top:15px"></div>' +
+        '</div></div>';
+
     html += '</td></tr></tbody></table>';
     root.innerHTML = html;
     
     ligarPagamentos();
+    ligarTransacoes();
+    const dropdown = document.getElementById("filtro-status-anuncios");
+    if (dropdown) {
+      dropdown.addEventListener("change", () => {
+        carregarAnuncios(uuid, 0);
+      });
+    }
+    carregarAnuncios(uuid, 0);
+  }
+
+  async function carregarAnuncios(uuid, paginaAtual = 0) {
+    const el = document.getElementById("meus-anuncios");
+    const areaBtn = document.getElementById("area-carregar-mais-anuncios");
+    const statusFiltro = document.getElementById("filtro-status-anuncios") ? document.getElementById("filtro-status-anuncios").value : "ACTIVE";
+    
+    areaBtn.innerHTML = '<span class="carregando">Buscando lotes...</span>';
+
+    try {
+      const tamanhoPagina = 12;
+      const pagina = await API.sellerListings(uuid, paginaAtual, tamanhoPagina, statusFiltro);
+      const itens = (pagina && pagina.content) || [];
+
+      areaBtn.innerHTML = ''; 
+
+      if (!itens.length && paginaAtual === 0) {
+        el.innerHTML = '<span class="dica">Você não possui anúncios com este status.</span>';
+        return;
+      }
+
+      if (paginaAtual === 0) {
+        el.innerHTML = '';
+      }
+
+      el.insertAdjacentHTML('beforeend', itens.map(UI.cartaoLote).join(""));
+
+      const isLast = pagina.last !== undefined ? pagina.last : (itens.length < tamanhoPagina);
+
+      if (!isLast) {
+        areaBtn.innerHTML = '<button type="button" class="botao botao-grande" id="btn-carregar-mais-meus-anuncios">Carregar mais anúncios ⬇</button>';
+        document.getElementById("btn-carregar-mais-meus-anuncios").addEventListener("click", () => {
+          carregarAnuncios(uuid, paginaAtual + 1);
+        });
+      }
+    } catch (e) {
+      if (paginaAtual === 0) {
+        el.innerHTML = '<span class="mensagem-erro">Não foi possível carregar os lotes: ' + UI.esc(e.message) + '</span>';
+      } else {
+        areaBtn.innerHTML = '<span class="mensagem-erro">Erro ao carregar mais lotes. Tente novamente.</span>';
+      }
+    }
   }
 
   function ligarPagamentos() {
@@ -125,6 +210,26 @@
           setTimeout(function() { window.location.reload(); }, 1500);
         } catch (e) {
           msg.innerHTML = '<span class="mensagem-erro">Falha ao simular: ' + UI.esc(e.message) + '</span>';
+          this.disabled = false;
+        }
+      });
+    });
+  }
+
+  function ligarTransacoes() {
+    const btns = document.querySelectorAll(".btn-confirmar-entrega");
+    btns.forEach(function (btn) {
+      btn.addEventListener("click", async function () {
+        const tid = this.getAttribute("data-tid");
+        const msg = document.getElementById("msg-transacao");
+        msg.innerHTML = '<span class="carregando">Confirmando recebimento...</span>';
+        this.disabled = true;
+        try {
+          await API.confirmDelivery(tid);
+          msg.innerHTML = '<span class="mensagem-ok">Recebimento confirmado com sucesso! Atualizando...</span>';
+          setTimeout(function() { window.location.reload(); }, 1500);
+        } catch (e) {
+          msg.innerHTML = '<span class="mensagem-erro">Falha ao confirmar: ' + UI.esc(e.message) + '</span>';
           this.disabled = false;
         }
       });

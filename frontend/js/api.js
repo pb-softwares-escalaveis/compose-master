@@ -74,8 +74,18 @@
     autocomplete: function (q) {
       return request("/listings/auctions/search/autocomplete" + qs({ q: q }));
     },
-    sellerListings: function (sellerId, page, size) {
-      return request("/listings/auctions/search" + qs({ sellerId: sellerId, page: page, size: size }));
+    sellerListings: function (sellerId, page, size, status) {
+      return request("/listings/auctions/search" + qs({
+        sellerId: sellerId,
+        userId: sellerId,
+        seller: sellerId,
+        vendedorId: sellerId,
+        seller_id: sellerId,
+        user_id: sellerId,
+        page: page,
+        size: size,
+        status: status
+      }));
     },
 
     // ---------- RECOMMENDATION-SERVICE (futuro) ----------
@@ -134,6 +144,14 @@
     },
     simulatePayment: function (providerPaymentId) {
       return request("/payments/simulate/" + encodeURIComponent(providerPaymentId), { method: "POST" });
+    },
+
+    // ---------- TRANSACTION-SERVICE ----------
+    getTransaction: function (transactionId) {
+      return request("/transactions/" + encodeURIComponent(transactionId));
+    },
+    confirmDelivery: function (transactionId) {
+      return request("/transactions/" + encodeURIComponent(transactionId) + "/confirm-delivery", { method: "POST" });
     }
   };
 })();

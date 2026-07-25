@@ -1,0 +1,122 @@
+/* ============================================================
+   O LEILOEIRO ONLINE - Retro Theme for Keycloak
+   ============================================================ */
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: Verdana, Geneva, Tahoma, sans-serif !important;
+  font-size: 13px !important;
+  color: #000080 !important;
+  background-color: #008080 !important;
+  background-image:
+    repeating-linear-gradient(0deg, rgba(255,255,255,0.04) 0, rgba(255,255,255,0.04) 1px, transparent 1px, transparent 4px) !important;
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3Ctext y='18' font-size='18'%3E%F0%9F%96%B1%EF%B8%8F%3C/text%3E%3C/svg%3E"), auto !important;
+}
+
+.login-pf-page {
+  padding-top: 50px;
+}
+
+.card-pf {
+  background: #c0c0c0 !important;
+  border: 3px outset #ffffff !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: 20px !important;
+  max-width: 400px !important;
+  margin: 0 auto;
+}
+
+/* Header inside the login box */
+#kc-header-wrapper {
+  font-family: "Times New Roman", Times, serif !important;
+  font-size: 28px !important;
+  color: #ffff00 !important;
+  text-shadow: 2px 2px 0 #ff00ff, 3px 3px 0 #000000 !important;
+  letter-spacing: 1px !important;
+  text-transform: none !important;
+  margin-bottom: 20px;
+}
+
+.login-pf-header {
+  background: linear-gradient(180deg, #000080 0%, #4040b0 100%) !important;
+  border: 2px inset #8080ff !important;
+  padding: 6px 10px !important;
+  color: #ffff00 !important;
+  text-align: center;
+  margin-bottom: 20px !important;
+}
+
+#kc-page-title {
+  color: #ffffff !important;
+  font-weight: bold !important;
+  font-size: 16px !important;
+  font-family: Verdana, sans-serif !important;
+}
+
+/* Labels and text */
+.pf-c-form__label-text, .pf-v5-c-form__label-text {
+  font-weight: bold !important;
+  color: #000080 !important;
+  font-family: Verdana, sans-serif !important;
+  font-size: 13px !important;
+}
+
+/* Inputs */
+.pf-c-form-control, .pf-v5-c-form-control {
+  font-family: Verdana, sans-serif !important;
+  font-size: 13px !important;
+  border: 2px inset #808080 !important;
+  padding: 6px !important;
+  background: #ffffd0 !important;
+  border-radius: 0 !important;
+  color: #000 !important;
+}
+
+.pf-c-form-control:focus, .pf-v5-c-form-control:focus {
+  border: 2px inset #000 !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Primary Buttons */
+.pf-m-primary, .pf-v5-c-button.pf-m-primary {
+  font-family: Verdana, sans-serif !important;
+  font-weight: bold !important;
+  background: linear-gradient(180deg, #ffffff 0%, #b0b0b0 100%) !important;
+  border: 2px outset #ffffff !important;
+  color: #000080 !important;
+  padding: 8px 12px !important;
+  border-radius: 0 !important;
+  cursor: pointer !important;
+}
+
+.pf-m-primary:hover, .pf-v5-c-button.pf-m-primary:hover {
+  background: linear-gradient(180deg, #ffff80 0%, #ffd000 100%) !important;
+  color: #ff0000 !important;
+}
+
+.pf-m-primary:active, .pf-v5-c-button.pf-m-primary:active {
+  border-style: inset !important;
+}
+
+/* Links */
+a {
+  color: #0000ee !important;
+  text-decoration: underline !important;
+  font-family: Verdana, sans-serif !important;
+  font-size: 13px !important;
+}
+
+a:hover {
+  color: #ff0000 !important;
+}
+
+/* Alerts / Errors */
+.pf-m-danger, .pf-c-alert.pf-m-danger {
+  background: #ffe0e0 !important;
+  border: 2px outset #ff0000 !important;
+  color: #ff0000 !important;
+  font-weight: bold !important;
+}
