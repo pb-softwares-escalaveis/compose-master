@@ -34,7 +34,9 @@ reviews.auction.rejected:3
 reviews.qa.approved:3
 reviews.qa.rejected:3
 reviews.report.auction-approved:3
+reviews.report.auction-rejected:3
 reviews.report.qa-approved:3
+reviews.report.qa-rejected
 
 transactions.payment.requested:3
 transactions.status.closed:3
