@@ -123,7 +123,7 @@ services:
       kafka:
         condition: service_healthy
     ports:
-      - "8085:8080"
+      - "9000:8080"
     environment:
       KAFKA_CLUSTERS_0_NAME: leilao-local
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092
@@ -864,7 +864,7 @@ services:
           cpus: '0.5'
           memory: '512M'
     container_name: report-service
-    image: pedrovncs/report-service:arm64
+    image: shyuu7/report-service:latest
     restart: always
     ports:
       - "${REPORT_SERVICE_PORT}:8081"
@@ -946,7 +946,7 @@ services:
           cpus: '0.5'
           memory: '512M'
     container_name: notification-service
-    image: pedrovncs/notification-service:arm64
+    image: pedrovncs/notification-service:latest
     env_file:
       - .env
     ports:
@@ -1087,7 +1087,7 @@ services:
         limits:
           cpus: '0.5'
           memory: '512M'
-    image: pedrovncs/payment-service:arm64
+    image: pedrovncs/payment-service:latest
     container_name: payment-service
     env_file:
       - .env
@@ -1112,7 +1112,7 @@ services:
         limits:
           cpus: '0.5'
           memory: '512M'
-    image: pedrovncs/listing-service:arm64
+    image: pedrovncs/listing-service:latest
     container_name: listing-service
     ports:
       - "${LISTING_SERVICE_PORT}:8080"
@@ -1143,7 +1143,7 @@ services:
         limits:
           cpus: '0.5'
           memory: '512M'
-    image: pedrovncs/auction-service:arm64
+    image: pedrovncs/auction-service:latest
     container_name: auction-service
     ports:
       - "${AUCTION_SERVICE_PORT}:8080"
