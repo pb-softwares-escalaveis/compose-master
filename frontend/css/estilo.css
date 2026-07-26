@@ -2,7 +2,9 @@
    O LEILOEIRO ONLINE - Folha de estilo retrô (anos 2000)
    ============================================================ */
 
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+}
 
 body {
   margin: 0;
@@ -12,13 +14,21 @@ body {
   color: #000080;
   background-color: #008080;
   background-image:
-    repeating-linear-gradient(0deg, rgba(255,255,255,0.04) 0, rgba(255,255,255,0.04) 1px, transparent 1px, transparent 4px);
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.04) 0, rgba(255, 255, 255, 0.04) 1px, transparent 1px, transparent 4px);
   cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3Ctext y='18' font-size='18'%3E%F0%9F%96%B1%EF%B8%8F%3C/text%3E%3C/svg%3E"), auto;
 }
 
-a { color: #0000ee; }
-a:visited { color: #551a8b; }
-a:hover { color: #ff0000; }
+a {
+  color: #0000ee;
+}
+
+a:visited {
+  color: #551a8b;
+}
+
+a:hover {
+  color: #ff0000;
+}
 
 /* ---------- Estrutura geral ---------- */
 .pagina {
@@ -38,6 +48,7 @@ a:hover { color: #ff0000; }
   color: #ffff00;
   text-align: center;
 }
+
 .cabecalho h1 {
   margin: 0;
   font-family: "Times New Roman", Times, serif;
@@ -46,12 +57,17 @@ a:hover { color: #ff0000; }
   text-shadow: 2px 2px 0 #ff00ff, 4px 4px 0 #000000;
   letter-spacing: 1px;
 }
+
 .cabecalho .slogan {
   color: #00ffff;
   font-style: italic;
   font-size: 12px;
 }
-.cabecalho .logo-martelo { font-size: 34px; vertical-align: middle; }
+
+.cabecalho .logo-martelo {
+  font-size: 34px;
+  vertical-align: middle;
+}
 
 /* ---------- Marquee ---------- */
 .faixa-rolante {
@@ -71,6 +87,7 @@ a:hover { color: #ff0000; }
   margin: 4px 0;
   text-align: center;
 }
+
 .menu a {
   display: inline-block;
   background: linear-gradient(180deg, #ffffff 0%, #c0c0c0 100%);
@@ -81,16 +98,28 @@ a:hover { color: #ff0000; }
   text-decoration: none;
   font-weight: bold;
 }
+
 .menu a:hover {
   background: linear-gradient(180deg, #ffff80 0%, #ffd000 100%);
   color: #ff0000;
 }
 
 /* ---------- Layout em colunas (tabela à moda antiga) ---------- */
-.layout { width: 100%; border-collapse: collapse; }
-.layout > tbody > tr > td { vertical-align: top; padding: 4px; }
-.coluna-lateral { width: 210px; }
-.conteudo { }
+.layout {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.layout>tbody>tr>td {
+  vertical-align: top;
+  padding: 4px;
+}
+
+.coluna-lateral {
+  width: 210px;
+}
+
+.conteudo {}
 
 /* ---------- Caixas / painéis ---------- */
 .caixa {
@@ -98,6 +127,7 @@ a:hover { color: #ff0000; }
   border: 2px inset #808080;
   margin-bottom: 8px;
 }
+
 .caixa .titulo {
   background: linear-gradient(180deg, #000080 0%, #3030a0 100%);
   color: #ffffff;
@@ -105,10 +135,15 @@ a:hover { color: #ff0000; }
   padding: 3px 6px;
   border-bottom: 1px solid #000;
 }
-.caixa .corpo { padding: 8px; }
+
+.caixa .corpo {
+  padding: 8px;
+}
 
 /* ---------- Botões ---------- */
-button, .botao, input[type=submit] {
+button,
+.botao,
+input[type=submit] {
   font-family: Verdana, sans-serif;
   font-weight: bold;
   background: linear-gradient(180deg, #ffffff 0%, #b0b0b0 100%);
@@ -117,19 +152,48 @@ button, .botao, input[type=submit] {
   padding: 4px 12px;
   cursor: pointer;
 }
-button:active, .botao:active, input[type=submit]:active { border-style: inset; }
-button:hover, .botao:hover { background: linear-gradient(180deg, #ffff80 0%, #ffd000 100%); }
-.botao { display: inline-block; text-decoration: none; }
-.botao-grande { font-size: 16px; padding: 8px 18px; }
+
+button:active,
+.botao:active,
+input[type=submit]:active {
+  border-style: inset;
+}
+
+button:hover,
+.botao:hover {
+  background: linear-gradient(180deg, #ffff80 0%, #ffd000 100%);
+}
+
+.botao {
+  display: inline-block;
+  text-decoration: none;
+}
+
+.botao-grande {
+  font-size: 16px;
+  padding: 8px 18px;
+}
+
 .botao-lance {
   background: linear-gradient(180deg, #80ff80 0%, #00a000 100%);
   color: #ffffff;
 }
 
 /* ---------- Formulários ---------- */
-label { font-weight: bold; display: block; margin: 6px 0 2px; }
-input[type=text], input[type=password], input[type=email], input[type=number],
-input[type=date], input[type=tel], select, textarea {
+label {
+  font-weight: bold;
+  display: block;
+  margin: 6px 0 2px;
+}
+
+input[type=text],
+input[type=password],
+input[type=email],
+input[type=number],
+input[type=date],
+input[type=tel],
+select,
+textarea {
   font-family: Verdana, sans-serif;
   font-size: 13px;
   border: 2px inset #808080;
@@ -137,13 +201,35 @@ input[type=date], input[type=tel], select, textarea {
   width: 100%;
   background: #ffffd0;
 }
-.campo-erro { border-color: #ff0000 !important; background: #ffe0e0 !important; }
-.mensagem-erro { color: #ff0000; font-weight: bold; }
-.mensagem-ok { color: #008000; font-weight: bold; }
-.dica { color: #606060; font-size: 11px; font-weight: normal; }
+
+.campo-erro {
+  border-color: #ff0000 !important;
+  background: #ffe0e0 !important;
+}
+
+.mensagem-erro {
+  color: #ff0000;
+  font-weight: bold;
+}
+
+.mensagem-ok {
+  color: #008000;
+  font-weight: bold;
+}
+
+.dica {
+  color: #606060;
+  font-size: 11px;
+  font-weight: normal;
+}
 
 /* ---------- Grade de lotes ---------- */
-.grade-lotes { display: flex; flex-wrap: wrap; gap: 8px; }
+.grade-lotes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
 .cartao-lote {
   width: 170px;
   background: #ffffff;
@@ -151,6 +237,7 @@ input[type=date], input[type=tel], select, textarea {
   padding: 4px;
   text-align: center;
 }
+
 .cartao-lote img {
   width: 100%;
   height: 120px;
@@ -158,18 +245,25 @@ input[type=date], input[type=tel], select, textarea {
   border: 1px solid #808080;
   background: #eee;
 }
+
 .cartao-lote .titulo-lote {
   font-weight: bold;
   height: 32px;
   overflow: hidden;
   margin: 4px 0;
 }
+
 .cartao-lote .preco {
   color: #008000;
   font-weight: bold;
   font-size: 15px;
 }
-.cartao-lote .categoria { color: #800080; font-size: 11px; }
+
+.cartao-lote .categoria {
+  color: #800080;
+  font-size: 11px;
+}
+
 .selo-novo {
   display: inline-block;
   background: #ff0000;
@@ -189,28 +283,31 @@ input[type=date], input[type=tel], select, textarea {
   border-top: 2px groove #ffffff;
   margin-top: 8px;
 }
+
 .contador-visitas {
   display: inline-flex;
   gap: 2px;
   vertical-align: middle;
   margin: 4px 2px;
 }
+
 .flip-digit {
   display: inline-block;
   width: 14px;
   height: 20px;
   line-height: 20px;
   text-align: center;
-  font-family: "Courier New", monospace;
-  font-size: 12px;
+  font-family: Consolas, "Lucida Console", "Courier New", monospace;
+  font-size: 14px;
   font-weight: bold;
   color: #e0f0ff;
   background: linear-gradient(180deg, #1a3a6a 0%, #0d2240 49.9%, #0a1a30 50.1%, #0d2240 100%);
   border: 1px solid #2a5a9a;
   border-radius: 4px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.5), inset 0 1px 0 rgba(100,160,255,0.15);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(100, 160, 255, 0.15);
   position: relative;
 }
+
 .flip-digit::after {
   content: "";
   position: absolute;
@@ -218,30 +315,79 @@ input[type=date], input[type=tel], select, textarea {
   right: 0;
   top: 50%;
   height: 1px;
-  background: rgba(0,0,0,0.6);
-  box-shadow: 0 1px 0 rgba(100,160,255,0.08);
+  background: rgba(0, 0, 0, 0.6);
+  box-shadow: 0 1px 0 rgba(100, 160, 255, 0.08);
 }
+
 .flip-digit.flip-anim {
   animation: flipDown 0.4s ease-in-out;
 }
+
 @keyframes flipDown {
-  0%   { transform: perspective(100px) rotateX(90deg); opacity: 0.3; }
-  50%  { transform: perspective(100px) rotateX(-10deg); opacity: 1; }
-  100% { transform: perspective(100px) rotateX(0deg); opacity: 1; }
+  0% {
+    transform: perspective(100px) rotateX(90deg);
+    opacity: 0.3;
+  }
+
+  50% {
+    transform: perspective(100px) rotateX(-10deg);
+    opacity: 1;
+  }
+
+  100% {
+    transform: perspective(100px) rotateX(0deg);
+    opacity: 1;
+  }
 }
 
 /* ---------- Diversos ---------- */
-.centro { text-align: center; }
-.carregando { color: #800080; font-weight: bold; }
-hr { border: 1px inset #808080; }
-.tabela-dados { width: 100%; border-collapse: collapse; }
-.tabela-dados th, .tabela-dados td { border: 1px solid #808080; padding: 4px; text-align: left; }
-.tabela-dados th { background: #000080; color: #fff; }
-.paginacao { text-align: center; margin: 8px 0; }
-.paginacao span { font-weight: bold; padding: 0 8px; }
+.centro {
+  text-align: center;
+}
+
+.carregando {
+  color: #800080;
+  font-weight: bold;
+}
+
+hr {
+  border: 1px inset #808080;
+}
+
+.tabela-dados {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.tabela-dados th,
+.tabela-dados td {
+  border: 1px solid #808080;
+  padding: 4px;
+  text-align: left;
+}
+
+.tabela-dados th {
+  background: #000080;
+  color: #fff;
+}
+
+.paginacao {
+  text-align: center;
+  margin: 8px 0;
+}
+
+.paginacao span {
+  font-weight: bold;
+  padding: 0 8px;
+}
 
 /* ---------- Passos do cadastro ---------- */
-.passos { display: flex; gap: 4px; margin-bottom: 10px; }
+.passos {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 10px;
+}
+
 .passos .passo {
   flex: 1;
   text-align: center;
@@ -251,10 +397,32 @@ hr { border: 1px inset #808080; }
   font-weight: bold;
   font-size: 11px;
 }
-.passos .passo.ativo { background: #ffff00; border-style: inset; }
-.passos .passo.feito { background: #80ff80; }
+
+.passos .passo.ativo {
+  background: #ffff00;
+  border-style: inset;
+}
+
+.passos .passo.feito {
+  background: #80ff80;
+}
 
 /* ---------- Perguntas e respostas ---------- */
-.pergunta { border: 1px solid #808080; background: #fff; margin-bottom: 6px; padding: 6px; }
-.pergunta .meta { color: #606060; font-size: 11px; }
-.resposta { background: #f0f0ff; border-left: 4px solid #000080; margin: 4px 0 0 16px; padding: 4px 6px; }
+.pergunta {
+  border: 1px solid #808080;
+  background: #fff;
+  margin-bottom: 6px;
+  padding: 6px;
+}
+
+.pergunta .meta {
+  color: #606060;
+  font-size: 11px;
+}
+
+.resposta {
+  background: #f0f0ff;
+  border-left: 4px solid #000080;
+  margin: 4px 0 0 16px;
+  padding: 4px 6px;
+}

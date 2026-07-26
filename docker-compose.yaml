@@ -93,7 +93,7 @@ services:
   # ============================================================
   kafka-init:
     container_name: kafka-init-python
-    image: pedrovncs/kafka-init-python:partition1
+    image: python:3.12-slim
     depends_on:
       kafka:
         condition: service_healthy
@@ -101,6 +101,12 @@ services:
         condition: service_started
     environment:
       KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      TOPICS_FILE: /config/topics.txt
+    volumes:
+      - ./config/kafka-init.py:/app/kafka-init.py:ro
+      - ./config/topics.txt:/config/topics.txt:ro
+    command: >
+      sh -c "pip install --quiet kafka-python-ng && python /app/kafka-init.py"
     restart: "no"
     networks:
       - leilao-network

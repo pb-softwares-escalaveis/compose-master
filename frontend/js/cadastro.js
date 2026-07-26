@@ -110,13 +110,7 @@
   document.getElementById("nome").addEventListener("blur", function () { sugerirUsernames(false); });
   document.getElementById("sobrenome").addEventListener("blur", function () { sugerirUsernames(false); });
 
-  const btnRefreshUsername = document.getElementById("btn-refresh-username");
-  if (btnRefreshUsername) {
-    btnRefreshUsername.addEventListener("click", function (ev) {
-      ev.preventDefault();
-      sugerirUsernames(true);
-    });
-  }
+
 
   let sugTimer = null;
   let sugSeed = 0;

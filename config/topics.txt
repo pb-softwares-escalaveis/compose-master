@@ -36,11 +36,7 @@ reviews.qa.rejected:3
 reviews.report.auction-approved:3
 reviews.report.auction-rejected:3
 reviews.report.qa-approved:3
-<<<<<<< HEAD
 reviews.report.qa-rejected:3
-=======
-reviews.report.qa-rejected
->>>>>>> c097ca10851a631568dd571c16dfd7a6cfe40f4a
 
 transactions.payment.requested:3
 transactions.status.closed:3
