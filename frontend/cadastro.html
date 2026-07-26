@@ -61,8 +61,11 @@
           <!-- PASSO 3: Acesso -->
           <fieldset class="bloco-passo" data-passo="3" style="display:none">
             <label for="username">Nome de usuário * <span class="dica">(4 a 50 caracteres)</span></label>
-            <input type="text" id="username" minlength="4" maxlength="50" required>
-            <div id="sugestoes-username" class="dica"></div>
+            <div style="display: flex; gap: 6px; align-items: center;">
+              <input type="text" id="username" minlength="4" maxlength="50" required style="flex: 1;">
+              <button type="button" id="btn-refresh-username" class="botao" title="Atualizar sugestões de apelidos" style="white-space: nowrap;">🔄 Recarregar</button>
+            </div>
+            <div id="sugestoes-username" class="dica" style="margin-top: 4px; min-height: 20px;"></div>
             <label for="senha">Senha * <span class="dica">(mínimo 8 caracteres)</span></label>
             <input type="password" id="senha" minlength="8" required>
             <label for="senha2">Confirme a senha *</label>

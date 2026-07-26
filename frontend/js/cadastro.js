@@ -83,6 +83,12 @@
     btnVoltar.style.display = p > 1 ? "" : "none";
     btnAvancar.style.display = p < TOTAL ? "" : "none";
     btnFinalizar.style.display = p === TOTAL ? "" : "none";
+    if (p === 3) {
+      const box = document.getElementById("sugestoes-username");
+      if (box && (!box.innerHTML || box.innerHTML.trim() === "")) {
+        sugerirUsernames(false);
+      }
+    }
     if (p === TOTAL) montarResumo();
     window.scrollTo(0, 0);
   }
@@ -101,29 +107,120 @@
   });
 
   // ---- Sugestão de usernames (usa /usuarios/listar-usernames?nome=) ----
-  document.getElementById("nome").addEventListener("blur", sugerirUsernames);
+  document.getElementById("nome").addEventListener("blur", function () { sugerirUsernames(false); });
+  document.getElementById("sobrenome").addEventListener("blur", function () { sugerirUsernames(false); });
+
+  const btnRefreshUsername = document.getElementById("btn-refresh-username");
+  if (btnRefreshUsername) {
+    btnRefreshUsername.addEventListener("click", function (ev) {
+      ev.preventDefault();
+      sugerirUsernames(true);
+    });
+  }
+
   let sugTimer = null;
-  function sugerirUsernames() {
-    const nome = val("nome");
-    if (!nome) return;
+  let sugSeed = 0;
+
+  function sugerirUsernames(forceRefresh) {
+    const baseNome = val("nome") || val("sobrenome") || "usuario";
     clearTimeout(sugTimer);
+
+    if (forceRefresh) {
+      sugSeed++;
+    }
+
+    const box = document.getElementById("sugestoes-username");
+    if (box) {
+      box.innerHTML = '<span class="carregando">Gerando sugestões de apelidos...</span>';
+    }
+
     sugTimer = setTimeout(async function () {
       try {
-        const lista = await API.suggestUsernames(nome);
-        const box = document.getElementById("sugestoes-username");
-        if (Array.isArray(lista) && lista.length) {
-          box.innerHTML = "Sugestões: " + lista.slice(0, 5).map(function (u) {
-            return '<a href="#" class="sug-user">' + UI.esc(u) + '</a>';
-          }).join(" · ");
-          box.querySelectorAll(".sug-user").forEach(function (a) {
-            a.addEventListener("click", function (ev) {
-              ev.preventDefault();
-              document.getElementById("username").value = this.textContent;
-            });
-          });
+        let lista = await API.suggestUsernames(baseNome);
+        if (!Array.isArray(lista) || !lista.length) {
+          lista = gerarUsernamesAlternativos(baseNome);
         }
-      } catch (_) { /* ignora */ }
-    }, 300);
+
+        if (forceRefresh || sugSeed > 0) {
+          lista = embaralharEDiversificar(lista, baseNome, sugSeed);
+        }
+
+        renderizarSugestoes(lista, box);
+      } catch (_) {
+        const lista = embaralharEDiversificar(gerarUsernamesAlternativos(baseNome), baseNome, sugSeed);
+        renderizarSugestoes(lista, box);
+      }
+    }, forceRefresh ? 100 : 300);
+  }
+
+  function renderizarSugestoes(lista, box) {
+    if (box && Array.isArray(lista) && lista.length) {
+      const sugestoesHtml = lista.slice(0, 5).map(function (u) {
+        return '<a href="#" class="sug-user" style="font-weight:bold; margin-right:4px;">' + UI.esc(u) + '</a>';
+      }).join(" · ");
+
+      box.innerHTML = 'Sugestões de apelido: ' + sugestoesHtml +
+        ' <button type="button" class="botao" id="link-refresh-sug" title="Atualizar sugestões de apelidos" style="padding:2px 8px; font-size:11px; margin-left:6px;">🔄 Recarregar</button>';
+
+      box.querySelectorAll(".sug-user").forEach(function (a) {
+        a.addEventListener("click", function (ev) {
+          ev.preventDefault();
+          document.getElementById("username").value = this.textContent;
+        });
+      });
+
+      const linkRef = box.querySelector("#link-refresh-sug");
+      if (linkRef) {
+        linkRef.addEventListener("click", function (ev) {
+          ev.preventDefault();
+          sugerirUsernames(true);
+        });
+      }
+    } else if (box) {
+      box.innerHTML = "";
+    }
+  }
+
+  function limparTexto(str) {
+    return (str || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]/g, "");
+  }
+
+  function gerarUsernamesAlternativos(rawNome) {
+    const n = limparTexto(rawNome) || "user";
+    const s = limparTexto(val("sobrenome"));
+    const ano = new Date().getFullYear();
+    const arr = [
+      n,
+      n + s,
+      n + "_" + s,
+      n + Math.floor(100 + Math.random() * 900),
+      n + ano,
+      s ? s + "." + n : n + "_leilao"
+    ];
+    return Array.from(new Set(arr)).filter(function (x) { return x.length >= 4; });
+  }
+
+  function embaralharEDiversificar(lista, rawNome, seed) {
+    const n = limparTexto(rawNome) || "user";
+    const s = limparTexto(val("sobrenome"));
+
+    const extra = [
+      n + (seed * 7 + Math.floor(Math.random() * 89 + 10)),
+      n + (s ? "_" + s.charAt(0) : "") + Math.floor(Math.random() * 999),
+      n + "_" + Math.floor(Math.random() * 9000 + 1000),
+      (s ? s + "_" : "") + n + Math.floor(Math.random() * 99),
+      n + "." + Math.floor(Math.random() * 999)
+    ];
+
+    const combinada = Array.from(new Set([...lista, ...extra])).filter(function (x) { return x.length >= 4; });
+
+    for (let i = combinada.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      const temp = combinada[i];
+      combinada[i] = combinada[j];
+      combinada[j] = temp;
+    }
+    return combinada;
   }
 
   // ---- Busca de CEP ----

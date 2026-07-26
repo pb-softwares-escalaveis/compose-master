@@ -23,7 +23,7 @@
       
       let me = null;
       try { me = await API.me(); } catch (_) { /* opcional */ }
-      
+
       let payments = null;
       try { payments = await API.getPayments(uuid); } catch (_) { /* opcional */ }
 
@@ -48,6 +48,55 @@
     }
   }
 
+  function obterDadosStatus(perfil, me, seller, usuarioLocal, uuid) {
+    const userId = uuid || (usuarioLocal && usuarioLocal.userId);
+    let savedStatus = localStorage.getItem("user_status_" + userId) ||
+                      localStorage.getItem("user_status");
+    let savedFim = localStorage.getItem("suspenso_ate_" + userId) ||
+                   localStorage.getItem("suspenso_ate");
+
+    let rawStatus = (perfil && perfil.status) ||
+                    (me && me.status) ||
+                    (seller && seller.status) ||
+                    (usuarioLocal && usuarioLocal.status) ||
+                    savedStatus ||
+                    null;
+
+    let tipo = "DESCONHECIDO";
+
+    if (rawStatus) {
+      const upper = String(rawStatus).toUpperCase();
+      if (upper.includes("BAN") || upper.includes("INATIV")) {
+        tipo = "BANIDO";
+      } else if (upper.includes("SUSP")) {
+        tipo = "SUSPENSO";
+      } else if (upper.includes("ATIV") || upper.includes("ACTIV")) {
+        tipo = "ATIVO";
+      }
+    }
+
+    if (tipo === "DESCONHECIDO") {
+      if (
+        (me && me.isAllowed === false) ||
+        (perfil && perfil.isAllowed === false)
+      ) {
+        tipo = "SUSPENSO";
+      } else if (
+        (me && me.isAllowed === true) ||
+        (perfil && perfil.isAllowed === true)
+      ) {
+        tipo = "ATIVO";
+      }
+    }
+
+    let dataFimSuspensao = (perfil && (perfil.suspensoAte || perfil.suspendedUntil)) ||
+                           (me && (me.suspensoAte || me.suspendedUntil)) ||
+                           (usuarioLocal && (usuarioLocal.suspensoAte || usuarioLocal.suspendedUntil)) ||
+                           savedFim;
+
+    return { tipo, rawStatus, dataFimSuspensao };
+  }
+
   function renderizar(uuid, perfil, seller, payments, me, transactions) {
     const nomeCompleto = seller ? [seller.nome, seller.sobrenome].filter(Boolean).join(" ") : "";
     const local = seller ? [seller.cidade, seller.estado, seller.pais].filter(Boolean).join(", ") : "";
@@ -62,6 +111,67 @@
     const email = me ? (me.email || me.emailAddress) : null;
     const cpf = me ? (me.cpf || me.document) : null;
 
+    const statusInfo = obterDadosStatus(perfil, me, seller, usuarioLocal, uuid);
+
+    let htmlStatusCard = '';
+    let badgeTabela = '';
+
+    if (statusInfo.tipo === "BANIDO") {
+      htmlStatusCard =
+        '<div style="margin-top:10px;">' +
+        '<span class="botao botao-status" data-tipo="BANIDO" style="font-size:11px; padding:3px 10px; cursor:pointer; font-weight:bold; background:linear-gradient(180deg, #ffcdd2 0%, #ef9a9a 100%); color:#b71c1c;">' +
+        'BANIDO' +
+        '</span>' +
+        '<div style="font-size:10px; color:#b71c1c; margin-top:4px;">CONTA DESATIVADA</div>' +
+        '</div>';
+
+      badgeTabela =
+        '<span class="botao botao-status" data-tipo="BANIDO" style="font-size:10px; padding:2px 8px; cursor:pointer; font-weight:bold; background:linear-gradient(180deg, #ffcdd2 0%, #ef9a9a 100%); color:#b71c1c;">' +
+        'BANIDO' +
+        '</span>';
+    } else if (statusInfo.tipo === "SUSPENSO") {
+      htmlStatusCard =
+        '<div style="margin-top:10px; width:100%;">' +
+        '<span class="botao botao-status" data-tipo="SUSPENSO" style="font-size:11px; padding:3px 10px; cursor:pointer; font-weight:bold; background:linear-gradient(180deg, #fff9c4 0%, #ffe082 100%); color:#8d6e63;">' +
+        'SUSPENSO' +
+        '</span>' +
+        (statusInfo.dataFimSuspensao ?
+          '<div style="margin-top:6px; padding:5px; background:#fffde7; border:1px solid #fbc02d; border-radius:3px; font-size:10px; color:#555;">' +
+          '<div style="font-weight:bold; color:#795548; margin-bottom:2px;">TEMPO RESTANTE:</div>' +
+          '<div id="suspensao-cronometro" style="font-weight:bold; color:#c62828; font-size:12px;">CALCULANDO...</div>' +
+          '</div>' : '') +
+        '</div>';
+
+      badgeTabela =
+        '<span class="botao botao-status" data-tipo="SUSPENSO" style="font-size:10px; padding:2px 8px; cursor:pointer; font-weight:bold; background:linear-gradient(180deg, #fff9c4 0%, #ffe082 100%); color:#8d6e63;">' +
+        'SUSPENSO' +
+        '</span>';
+    } else if (statusInfo.tipo === "ATIVO") {
+      htmlStatusCard =
+        '<div style="margin-top:10px;">' +
+        '<span class="botao botao-status" data-tipo="ATIVO" style="font-size:11px; padding:3px 10px; cursor:pointer; font-weight:bold; background:linear-gradient(180deg, #c8e6c9 0%, #a5d6a7 100%); color:#1b5e20;">' +
+        'ATIVO' +
+        '</span>' +
+        '</div>';
+
+      badgeTabela =
+        '<span class="botao botao-status" data-tipo="ATIVO" style="font-size:10px; padding:2px 8px; cursor:pointer; font-weight:bold; background:linear-gradient(180deg, #c8e6c9 0%, #a5d6a7 100%); color:#1b5e20;">' +
+        'ATIVO' +
+        '</span>';
+    } else {
+      htmlStatusCard =
+        '<div style="margin-top:10px;">' +
+        '<span class="botao botao-status" data-tipo="DESCONHECIDO" style="font-size:11px; padding:3px 10px; cursor:pointer; font-weight:bold; background:linear-gradient(180deg, #e0e0e0 0%, #bdbdbd 100%); color:#424242;">' +
+        'DESCONHECIDO' +
+        '</span>' +
+        '</div>';
+
+      badgeTabela =
+        '<span class="botao botao-status" data-tipo="DESCONHECIDO" style="font-size:10px; padding:2px 8px; cursor:pointer; font-weight:bold; background:linear-gradient(180deg, #e0e0e0 0%, #bdbdbd 100%); color:#424242;">' +
+        'DESCONHECIDO' +
+        '</span>';
+    }
+
     let html = '' +
         '<table class="layout"><tbody><tr>' +
         '<td class="coluna-lateral">' +
@@ -71,6 +181,7 @@
             : '<img src="img/sem-imagem.svg" style="width:100px;height:100px">') +
         '<div style="font-size:16px;font-weight:bold;margin-top:6px">' + UI.esc(perfil.username || "—") + '</div>' +
         (nota !== null && nota !== undefined ? '<div>Reputação: ⭐ ' + UI.esc(nota) + '</div>' : '') +
+        htmlStatusCard +
         '</div>' +
         '</div>' +
         '<div class="caixa"><div class="titulo">⚙️ Conta</div><div class="corpo">' +
@@ -83,6 +194,7 @@
         '<div class="caixa"><div class="titulo">📇 Dados Pessoais (Privado)</div><div class="corpo">' +
         '<table class="tabela-dados">' +
         linha("Usuário", UI.esc(perfil.username)) +
+        linha("Status da Conta", badgeTabela) +
         (email ? linha("E-mail", UI.esc(email)) : "") +
         (cpf ? linha("CPF", UI.esc(cpf)) : "") +
         (nomeCompleto ? linha("Nome", UI.esc(nomeCompleto)) : "") +
@@ -142,6 +254,18 @@
 
     html += '</td></tr></tbody></table>';
     root.innerHTML = html;
+
+    document.querySelectorAll(".botao-status").forEach(btn => {
+      btn.style.cursor = "pointer";
+      btn.title = "Clique para soltar emojis!";
+      btn.addEventListener("click", (ev) => {
+        soltarEmotes(ev, btn.getAttribute("data-tipo"));
+      });
+    });
+
+    if (statusInfo.tipo === "SUSPENSO") {
+      iniciarCronometroSuspensao(statusInfo.dataFimSuspensao);
+    }
     
     ligarPagamentos();
     ligarTransacoes();
@@ -152,6 +276,89 @@
       });
     }
     carregarAnuncios(uuid, 0);
+  }
+
+  function soltarEmotes(ev, tipo) {
+    let emotes = ['😄', '🎉', '✨', '🟢', '👍', '🥳', '🌟'];
+    if (tipo === 'SUSPENSO') {
+      emotes = ['⏳', '⚠️', '😔', '🟡', '🔒', '⏰', '😢'];
+    } else if (tipo === 'BANIDO') {
+      emotes = ['🚫', '⛔', '😭', '🔴', '❌', '💔', '😡'];
+    } else if (tipo === 'DESCONHECIDO') {
+      emotes = ['❓', '🤔', '🌫️', '❔', '🧐'];
+    }
+
+    const rect = ev.currentTarget.getBoundingClientRect();
+    const startX = rect.left + rect.width / 2;
+    const startY = rect.top + rect.height / 2;
+
+    for (let i = 0; i < 10; i++) {
+      const el = document.createElement("span");
+      const emote = emotes[Math.floor(Math.random() * emotes.length)];
+      el.textContent = emote;
+      el.style.position = "fixed";
+      el.style.left = startX + "px";
+      el.style.top = startY + "px";
+      el.style.fontSize = (16 + Math.random() * 14) + "px";
+      el.style.pointerEvents = "none";
+      el.style.zIndex = "99999";
+      el.style.transition = "transform 1.2s cubic-bezier(0.1, 0.8, 0.3, 1), opacity 1.2s ease-out";
+      el.style.transform = "translate(-50%, -50%) scale(1)";
+      el.style.opacity = "1";
+
+      document.body.appendChild(el);
+
+      const vx = (Math.random() - 0.5) * 140;
+      const vy = -60 - Math.random() * 90;
+      const rot = (Math.random() - 0.5) * 80;
+
+      requestAnimationFrame(() => {
+        el.style.transform = `translate(calc(-50% + ${vx}px), calc(-50% + ${vy}px)) rotate(${rot}deg) scale(${0.8 + Math.random() * 0.5})`;
+        el.style.opacity = "0";
+      });
+
+      setTimeout(() => {
+        if (el.parentNode) el.parentNode.removeChild(el);
+      }, 1250);
+    }
+  }
+
+  function iniciarCronometroSuspensao(dataFimStr) {
+    const el = document.getElementById("suspensao-cronometro");
+    if (!el) return;
+
+    if (!dataFimStr) {
+      el.innerText = "Reativação pendente";
+      return;
+    }
+
+    function atualizar() {
+      const agora = new Date().getTime();
+      const fim = new Date(dataFimStr).getTime();
+      const diff = fim - agora;
+
+      if (isNaN(fim) || diff <= 0) {
+        el.innerText = "Reativação iminente";
+        return;
+      }
+
+      const segsTotal = Math.floor(diff / 1000);
+      const dias = Math.floor(segsTotal / 86400);
+      const horas = Math.floor((segsTotal % 86400) / 3600);
+      const mins = Math.floor((segsTotal % 3600) / 60);
+      const segs = segsTotal % 60;
+
+      let res = "";
+      if (dias > 0) res += dias + "d ";
+      res += (horas < 10 ? "0" : "") + horas + "h ";
+      res += (mins < 10 ? "0" : "") + mins + "m ";
+      res += (segs < 10 ? "0" : "") + segs + "s";
+
+      el.innerText = res;
+    }
+
+    atualizar();
+    setInterval(atualizar, 1000);
   }
 
   async function carregarAnuncios(uuid, paginaAtual = 0) {
